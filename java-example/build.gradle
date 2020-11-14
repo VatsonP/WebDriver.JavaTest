@@ -1,0 +1,31 @@
+import javax.tools.JavaCompiler
+
+plugins {
+    id 'java'
+}
+
+group 'ru.stqa'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile 'org.seleniumhq.selenium:selenium-java:3.141.59'
+    // https://mvnrepository.com/artifact/commons-io/commons-io
+    testCompile group: 'commons-io', name: 'commons-io', version: '2.7'
+    //https://mvnrepository.com/artifact/com.tngtech.java/junit-dataprovider
+    testCompile group: 'com.tngtech.java', name: 'junit-dataprovider', version: '1.9.3'    
+}
+
+test{
+   // maxParallelForks = 3
+}
+
+tasks.withType(JavaCompile){
+    options.encoding = 'UTF-8'
+}
