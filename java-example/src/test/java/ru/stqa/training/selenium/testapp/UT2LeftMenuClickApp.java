@@ -1,7 +1,5 @@
 package ru.stqa.training.selenium.testapp;
 
-import org.openqa.selenium.By;
-
 import org.openqa.selenium.WebElement;
 import ru.stqa.training.selenium.driverbase.DriverBase;
 import ru.stqa.training.selenium.pages.PageParams;
@@ -47,16 +45,7 @@ public class UT2LeftMenuClickApp {
         adminLeftMenuPage   = new AdminLeftMenuPage(pageParams);
     }
 
-    public void ThreadSleep(long MSec) {
-        try {
-            Thread.sleep(MSec);
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
-        }
-    }
-
-
-    public void LoginAs(String usrText, String passText) {
+    private void LoginAs(String usrText, String passText) {
         if (adminPanelLoginPage.open().isOnThisPage()) {
             adminPanelLoginPage.enterUsername(usrText).enterPassword(passText).submitLogin();
         }
@@ -64,9 +53,7 @@ public class UT2LeftMenuClickApp {
 
     public void MyLeftMenuClick() {
 
-        adminPanelLoginPage.open(); //открыть страницу
-
-        LoginAs("admin", "admin");
+        LoginAs("admin", "admin");//открыть страницу и выполнить коннект под пользователем
 
         pageParams.getWebDriverWait().until(titleIs("My Store")); //подождать пока не загрузится страница с заголовком "My Store"
 
@@ -87,7 +74,7 @@ public class UT2LeftMenuClickApp {
             submenuPoints = adminLeftMenuPage.getCss_menu_id_doc_Elements(menuPoint); //menuPoint.findElements(By.cssSelector("[id^=doc-]"));
             submenuQuantity = submenuPoints.size(); // сохраняем количество пунктов подменю
 
-            ThreadSleep(sleepTimeMenuMSec);
+            pageParams.ThreadSleep(sleepTimeMenuMSec);
 
             if(submenuQuantity > 0) { //подменю есть
                 for (int j=0;j<submenuQuantity;j++) {
@@ -100,14 +87,14 @@ public class UT2LeftMenuClickApp {
 
                     isDisplayed_h1 = adminLeftMenuPage.css_h1_Element.isDisplayed(); //pageParams.getWebDriver().findElement(By.cssSelector("h1"));  //проверка наличия заголовка
 
-                    ThreadSleep(sleepTimeSubmenuMSec);
+                    pageParams.ThreadSleep(sleepTimeMenuMSec);
                 }
             } else {   // подменю нет
                 isDisplayed_h1 = adminLeftMenuPage.css_h1_Element.isDisplayed(); //pageParams.getWebDriver().findElement(By.cssSelector("h1"));  //проверка наличия заголовка
             }
         }
 
-        ThreadSleep(sleepTimeMSec);
+        pageParams.ThreadSleep(sleepTimeMenuMSec);
     }
 }
 

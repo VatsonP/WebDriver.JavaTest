@@ -32,8 +32,8 @@ import java.util.concurrent.TimeUnit;
 
 public interface DriverDefault {
 
-    enum WebDriverType { IE, Chrome, Firefox };
-    enum TestRunType   { Local, Remote };
+    enum WebDriverType { IE, Chrome, Firefox }
+    enum TestRunType   { Local, Remote }
 
     class LogListener extends AbstractWebDriverEventListener {
 
@@ -323,4 +323,11 @@ public interface DriverDefault {
         }
     }
 
+    default void ThreadSleep(long MSec) {
+        try {
+            Thread.sleep(MSec);
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+        }
+    }
 }

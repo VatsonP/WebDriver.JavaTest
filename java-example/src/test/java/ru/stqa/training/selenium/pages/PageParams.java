@@ -20,4 +20,8 @@ public class PageParams {
     }
 
     public static String getCurrentIpStr() { return DriverBase.getCurrentIpStr(); }
+
+    public void ThreadSleep(long MSec) {
+        getDriverBase().ThreadSleep(MSec);
+    }
 }
