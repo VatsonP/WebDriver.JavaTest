@@ -23,6 +23,6 @@
 hs_err_pid*
 
 # My Add Settings: Log *.txt and *.png
-*.txt
-*.png
+java-example/Log/*.txt
+java-example/screenshot/*.png
 .idea/workspace.xml
