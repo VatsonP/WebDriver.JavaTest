@@ -2,8 +2,8 @@ package ru.stqa.training.selenium.tests;
 
 import org.junit.*;
 import ru.stqa.training.selenium.driverbase.DriverBaseParams;
-import ru.stqa.training.selenium.testapp.UT2LeftMenuClickApp;
 import ru.stqa.training.selenium.testbase.TestBase;
+import ru.stqa.training.selenium.testapp.UT2LeftMenuClickApp;
 
 
 
@@ -15,11 +15,11 @@ public class UT2LeftMenuClickTests extends TestBase {
 
     private UT2LeftMenuClickApp ut2LeftMenuClickApp;
 
-    protected UT2LeftMenuClickApp getApp() {
+    private UT2LeftMenuClickApp getApp() {
         return ut2LeftMenuClickApp;
     }
-    private void setApp(UT2LeftMenuClickApp newUTT1CustomerRegistrationApp) {
-        ut2LeftMenuClickApp =  newUTT1CustomerRegistrationApp;
+    private void setApp(UT2LeftMenuClickApp newUT2LeftMenuClickApp) {
+        ut2LeftMenuClickApp =  newUT2LeftMenuClickApp;
     }
 
     public UT2LeftMenuClickTests()
