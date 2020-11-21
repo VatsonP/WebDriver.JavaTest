@@ -22,7 +22,7 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-# My Add Settings: Log *.txt and *.png
-java-example/Log/*.txt
-java-example/screenshot/*.png
+# My Add Settings: Log/*.txt and screenshot/*.png
+java-example/Log/
+java-example/screenshot/
 .idea/workspace.xml
