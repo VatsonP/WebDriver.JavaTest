@@ -172,6 +172,7 @@ public class DriverBase implements DriverDefault {
         WebDriverType wbType   = WebDriverType.Chrome;
 
         setTestRunType(tRunType);
+        setWebDriverType(wbType);
 
         currentIpStr = defineCurrentIpStr(getTestRunType());
 
@@ -182,7 +183,6 @@ public class DriverBase implements DriverDefault {
                 driver.unregister(logListener);
             }
 
-            setWebDriverType(wbType);
             initLogListenerAndWait();
             //Регистрируем наблюдатель
             driver.register(logListener);
@@ -193,14 +193,14 @@ public class DriverBase implements DriverDefault {
 
         // Создаем обертку класса WebDriver для последующего сохранения  логов
         if (getTestRunType() == TestRunType.Local) {
-            driver = new EventFiringWebDriver(newDriverSetOptions(wbType));
+            driver = new EventFiringWebDriver(newDriverSetOptions(getWebDriverType()));
         }
         else
         if (getTestRunType() == TestRunType.Remote) {
             //URL
             String uriString = "http://" + remoteIpStr + ":4444/wd/hub/";
             // Создаем обертку класса WebDriver для последующего сохранения  логов
-            driver = new EventFiringWebDriver( newRemoteWebDriverSetOptions(new URL(uriString), wbType) );
+            driver = new EventFiringWebDriver( newRemoteWebDriverSetOptions(new URL(uriString), getWebDriverType()) );
         }
 
         tlDriver.set(driver);
@@ -450,7 +450,6 @@ public class DriverBase implements DriverDefault {
     public void findElmAndClick(WebDriver webDriver, By locator)
     {
         clickElement(findElm(webDriver, locator));
-
     }
 
 }

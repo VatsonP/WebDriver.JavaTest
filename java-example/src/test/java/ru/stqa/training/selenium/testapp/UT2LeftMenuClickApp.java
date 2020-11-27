@@ -83,7 +83,8 @@ public class UT2LeftMenuClickApp {
                     // определение списка пунктов подменю
                     submenuPoints = adminLeftMenuPage.getCss_menu_id_doc_Elements(menuPoint);//menuPoint.findElements(By.cssSelector("[id^=doc-]"));
                     submenuPoint = submenuPoints.get(j); //выбираем пункт подменю
-                    pageParams.getDriverBase().clickElement(submenuPoint, pageParams.getDriverBase().getWebDriverType());  //кликаем по подменю
+
+                    pageParams.clickElement(submenuPoint);  //кликаем по подменю
 
                     isDisplayed_h1 = adminLeftMenuPage.css_h1_Element.isDisplayed(); //pageParams.getWebDriver().findElement(By.cssSelector("h1"));  //проверка наличия заголовка
 

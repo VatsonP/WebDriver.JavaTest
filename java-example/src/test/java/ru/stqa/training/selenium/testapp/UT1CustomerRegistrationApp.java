@@ -45,11 +45,11 @@ public class UT1CustomerRegistrationApp {
 
         registrationPage.DriverSleep();
 
-        registrationPage.takeScreenshot("ScreenOne");
+        pageParams.takeScreenshot("ScreenOne");
 
         registrationPage.createAccountButton.click();
 
-        registrationPage.takeScreenshot( "ScreenTwo");
+        pageParams.takeScreenshot( "ScreenTwo");
     }
 
     public Set<String> getCustomerIds() {

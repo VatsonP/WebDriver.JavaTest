@@ -11,7 +11,4 @@ public class Page {
         this.pageParams  = pageParams;
     }
 
-    public void takeScreenshot(String fileNameWithoutExt) {
-        pageParams.getDriverBase().takeScreenshot(pageParams.getWebDriver(), fileNameWithoutExt);
-    }
 }
