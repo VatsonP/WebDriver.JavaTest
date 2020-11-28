@@ -46,15 +46,14 @@ public class UT3CheckNewTabsApp {
         if (adminPanelLoginPage.open().isOnThisPage()) {
             adminPanelLoginPage.enterUsername(usrText).enterPassword(passText).submitLogin();
         }
+
+        adminLeftMenuPage.waitUntilMyStore(); //подождать пока не загрузится страница с заголовком "My Store"
     }
 
 
     public void myCheckNewTabs() {
 
         LoginAs("admin", "admin");//открыть страницу и выполнить коннект под пользователем
-
-        adminLeftMenuPage.waitUntilMyStore();
-        //подождать пока не загрузится страница с заголовком "My Store"
 
         //открыть страницу со списком стран
         adminLeftMenuPage.OpenCountries();
