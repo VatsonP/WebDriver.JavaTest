@@ -17,11 +17,11 @@ public class AdminLeftMenuPage extends Page {
 
     public AdminLeftMenuPage(PageParams pageParams) {
         super(pageParams);
-        PageFactory.initElements(pageParams.getWebDriver(), this);
+        PageFactory.initElements(PageParams.getWebDriver(), this);
     }
 
     public void open() {
-        pageParams.getWebDriver().get("http://" + pageParams.getCurrentIpStr() + ":8080/litecart/admin/"); //открыть страницу
+        PageParams.getWebDriver().get("http://" + PageParams.getCurrentIpStr() + ":8080/litecart/admin/"); //открыть страницу
     }
 
     @FindBy(id="app-")
@@ -49,19 +49,19 @@ public class AdminLeftMenuPage extends Page {
     public AdminLeftMenuPage waitUntilEditCountry()
     {
         // открываем страницу выбранной страны
-        pageParams.getWebDriverWait().until(titleContains("Edit Country"));
+        PageParams.getWebDriverWait().until(titleContains("Edit Country"));
         // ждем загрузки страницы
         return this;
     }
 
     public String getCurrentWindowHandle()
     {
-        return pageParams.getWebDriver().getWindowHandle();
+        return PageParams.getWebDriver().getWindowHandle();
     }
 
     public Set<String> getWindowHandles()
     {
-        return pageParams.getWebDriver().getWindowHandles();
+        return PageParams.getWebDriver().getWindowHandles();
     }
 
     private ExpectedCondition<String> anyWindowOtherThan(Set<String> oldWindows) {
@@ -76,22 +76,22 @@ public class AdminLeftMenuPage extends Page {
 
     public String waitUntilEditCountry(Set<String> existingWindows)
     {
-        return pageParams.getWebDriverWait().until(anyWindowOtherThan(existingWindows)); // ждем загрузки окна
+        return PageParams.getWebDriverWait().until(anyWindowOtherThan(existingWindows)); // ждем загрузки окна
     }
 
     public void SwitchToWindow(String strWindow)
     {
-        pageParams.getWebDriver().switchTo().window(strWindow);   // переключаемся в новое окно
+        PageParams.getWebDriver().switchTo().window(strWindow);   // переключаемся в новое окно
     }
 
     public void CloseCurWindow()
     {
-        pageParams.getWebDriver().close(); // закрываем окно
+        PageParams.getWebDriver().close(); // закрываем окно
     }
    
     public AdminLeftMenuPage waitUntilMyStore()
     {
-        pageParams.getWebDriverWait().until(titleIs("My Store"));
+        PageParams.getWebDriverWait().until(titleIs("My Store"));
         //подождать пока не загрузится страница с заголовком "My Store"
         return this;
     }
@@ -99,14 +99,14 @@ public class AdminLeftMenuPage extends Page {
     public AdminLeftMenuPage OpenCountries()
     {
         //XAMPP litecart admin page - "http://" + CurrentIpStr + ":8080/litecart/admin/?app=countries&doc=countries"
-        pageParams.getWebDriver().get("http://" + pageParams.getCurrentIpStr() + ":8080/litecart/admin/?app=countries&doc=countries");
+        PageParams.getWebDriver().get("http://" + PageParams.getCurrentIpStr() + ":8080/litecart/admin/?app=countries&doc=countries");
         //открыть страницу со списком стран
 
         return this;
     }
     public AdminLeftMenuPage waitUntilCountries()
     {
-        pageParams.getWebDriverWait().until(titleContains("Countries"));
+        PageParams.getWebDriverWait().until(titleContains("Countries"));
         // ждем загрузки страницы
         return this;
     }

@@ -5,7 +5,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class Page {
 
-    protected static PageParams pageParams;
+    protected PageParams pageParams;
 
     public Page(PageParams pageParams) {
         this.pageParams  = pageParams;

@@ -49,13 +49,13 @@ public class UT2LeftMenuClickApp {
         if (adminPanelLoginPage.open().isOnThisPage()) {
             adminPanelLoginPage.enterUsername(usrText).enterPassword(passText).submitLogin();
         }
+
+        adminLeftMenuPage.waitUntilMyStore(); //подождать пока не загрузится страница с заголовком "My Store"
     }
 
     public void MyLeftMenuClick() {
 
         LoginAs("admin", "admin");//открыть страницу и выполнить коннект под пользователем
-
-        pageParams.getWebDriverWait().until(titleIs("My Store")); //подождать пока не загрузится страница с заголовком "My Store"
 
         menuPoints = adminLeftMenuPage.id_app_Elements; //pageParams.getWebDriver().findElements(By.id("app-"));
 
