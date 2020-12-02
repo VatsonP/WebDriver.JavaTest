@@ -44,7 +44,7 @@ public class DriverBase implements DriverDefault {
     // Для логгирования процесса
     protected static EventFiringWebDriver driver; //WebDriver
     public static WebDriver getWebDriver() {
-        return (WebDriver)driver;
+        return driver;
     }
 
     protected static LogListener          logListener;
@@ -53,10 +53,6 @@ public class DriverBase implements DriverDefault {
     public static WebDriverWait getWebDriverWait() {
         return wait;
     }
-
-    private static String localHostStr = "localhost";    // LocalHost
-    private static String localIpStr   = "192.168.0.101"; // Local Host Ip
-    private static String remoteIpStr  = "192.168.203.128";
 
     private static String currentIpStr;
     // Remote WinServer2019 with Docker "192.168.0.91"
@@ -88,14 +84,14 @@ public class DriverBase implements DriverDefault {
         testRunType = newTestRunType;
     }
 
-    private static String defineCurrentIpStr(TestRunType tRunType) {
+    private String defineCurrentIpStr(TestRunType tRunType) {
         if (tRunType == TestRunType.Local)
-            return localHostStr;
+            return driverBaseParams.getLocalHostStr();
         else
         if (tRunType == TestRunType.Remote)
-            return localIpStr;
+            return driverBaseParams.getLocalIpStr();
         else
-            return "";
+            return driverBaseParams.getLocalIpStr();
     }
 
 
@@ -198,7 +194,7 @@ public class DriverBase implements DriverDefault {
         else
         if (getTestRunType() == TestRunType.Remote) {
             //URL
-            String uriString = "http://" + remoteIpStr + ":4444/wd/hub/";
+            String uriString = "http://" + driverBaseParams.getRemoteIpStr() + ":4444/wd/hub/";
             // Создаем обертку класса WebDriver для последующего сохранения  логов
             driver = new EventFiringWebDriver( newRemoteWebDriverSetOptions(new URL(uriString), getWebDriverType()) );
         }
