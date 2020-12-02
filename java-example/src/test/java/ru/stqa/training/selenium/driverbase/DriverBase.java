@@ -31,13 +31,6 @@ import java.util.concurrent.TimeUnit;
 
 public class DriverBase implements DriverDefault {
 
-    // константа времени (в сек) общих неявных ожиданий
-    private static final int c_drvImplWaitTime = 5;
-    // константа времени (в сек) для явных ожиданий
-    private static final int c_drvExplWaitTime = 10;
-    // константа времени (в сек) для максимального времени неявного ожидания
-    private static final int c_drvMaxWaitTime  = 15;
-
     // Для возможности распараллеливания тестов - инициализация хранилища драйверов tlDriver
     // + см. опцию maxParallelForks в файле конфигурации build.gradle в корне проекта
     protected static ThreadLocal<EventFiringWebDriver> tlDriver;// = new ThreadLocal<>();
