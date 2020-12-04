@@ -115,9 +115,9 @@ public class DriverBase implements DriverDefault {
         logListener = new LogListener(logWriter);
 
         // Для установки общих неявных ожиданий
-        driver.manage().timeouts().implicitlyWait(driverBaseParams.drvImplWaitTime, TimeUnit.SECONDS);
+        driver.manage().timeouts().implicitlyWait(driverBaseParams.getImplWaitTime(), TimeUnit.SECONDS);
         // Для задания явных ожиданий
-        wait = new WebDriverWait(driver, driverBaseParams.drvExplWaitTime);
+        wait = new WebDriverWait(driver, driverBaseParams.getExplWaitTime());
     }
 
     // ---------------------------------------------------------------------------------------

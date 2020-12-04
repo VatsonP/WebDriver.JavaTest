@@ -83,7 +83,7 @@ public class CheckProductPage extends DriverBase {
 
 
         productUnit.click();  // открываем страницу продукта
-        wait = new WebDriverWait(driver, driverBaseParams.drvExplWaitTime); // даем время на загрузку
+        wait = new WebDriverWait(driver, driverBaseParams.getExplWaitTime()); // даем время на загрузку
 
         productUnit = driver.findElement(By.cssSelector("[id=box-product]"));
         // выбираем блок продукта на странице

@@ -4,11 +4,16 @@ package ru.stqa.training.selenium.driverbase;
 public class DriverBaseParams {
 
     // переменная времени (в сек) общих неявных ожиданий
-    public int drvImplWaitTime = DriverConst.drvImplWaitTime;
+    private int drvImplWaitTime = DriverConst.drvImplWaitTime;
+    public  int getImplWaitTime() { return drvImplWaitTime; }
+
     // переменная времени (в сек) для явных ожиданий
-    public int drvExplWaitTime = DriverConst.drvExplWaitTime;
+    private int drvExplWaitTime = DriverConst.drvExplWaitTime;
+    public  int getExplWaitTime() { return drvExplWaitTime; }
+
     // переменная времени (в сек) для максимального времени неявного ожидания
-    public int drvMaxWaitTime = DriverConst.drvMaxWaitTime;
+    private int drvMaxWaitTime = DriverConst.drvMaxWaitTime;
+    public  int getMaxWaitTime() { return drvMaxWaitTime; }
 
     // LocalHost
     private static final String localHostStr = DriverConst.localHostStr;
