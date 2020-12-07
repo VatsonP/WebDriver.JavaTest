@@ -9,6 +9,7 @@ public abstract class DriverConst {
     // константа времени (в сек) для максимального времени неявного ожидания
     public  static final int drvMaxWaitTime  = 15;
 
+    public static final String localHostStr = "localhost";
     // Local Windows Ip
     public  static final String localIpStr_Win = "192.168.0.101";
     // Remote WinServer2019 with Docker "192.168.0.91"
