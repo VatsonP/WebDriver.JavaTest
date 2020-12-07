@@ -28,7 +28,7 @@ public class UT4CheckCartTests extends TestBase {
 
 
     @Test
-    public void TestMyLeftMenuClick() {
+    public void TestMyCheckCart() {
         getApp().initPages(getDrvBase());
 
         getApp().myCheckCart();
