@@ -1,16 +1,12 @@
 package ru.stqa.training.selenium.testapp;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 import ru.stqa.training.selenium.driverbase.DriverBase;
-import ru.stqa.training.selenium.pages.AdminLeftMenuPage;
-import ru.stqa.training.selenium.pages.AdminPanelLoginPage;
+import ru.stqa.training.selenium.pages.MainLiteCartPage;
 import ru.stqa.training.selenium.pages.PageParams;
 
 import java.util.List;
-
-import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 
 
 public class UT4CheckCartApp {
@@ -21,26 +17,16 @@ public class UT4CheckCartApp {
     private String[] prodName;
     private static final int  prodCartCount = 3;
 
-    private static final long sleepTimeMsek = 500;
+    private static final long sleepTimeMsek = 300;
 
     private PageParams pageParams;
-    private AdminPanelLoginPage adminPanelLoginPage;
-    private AdminLeftMenuPage   adminLeftMenuPage;
+    private MainLiteCartPage    mainLiteCartPage;
 
     public void initPages(DriverBase drvBase) {
 
         pageParams = new PageParams(drvBase);
 
-        adminPanelLoginPage = new AdminPanelLoginPage(pageParams);
-        adminLeftMenuPage   = new AdminLeftMenuPage(pageParams);
-    }
-
-    private void LoginAs(String usrText, String passText) {
-        if (adminPanelLoginPage.open().isOnThisPage()) {
-            adminPanelLoginPage.enterUsername(usrText).enterPassword(passText).submitLogin();
-        }
-
-        adminLeftMenuPage.waitUntilMyStore(); //подождать пока не загрузится страница с заголовком "My Store"
+        mainLiteCartPage   = new MainLiteCartPage(pageParams);
     }
 
 
@@ -48,8 +34,9 @@ public class UT4CheckCartApp {
         prodName = new String[prodCartCount];
 
         for (i=0; i<prodCartCount; i++) {
-            PageParams.getWebDriver().get("http://" + PageParams.getCurrentIpStr() + ":8080/litecart/en/"); //открыть главную страницу магазина
-            PageParams.getWebDriverWait().until(titleContains("Online Store"));
+
+            mainLiteCartPage.open().waitUntilMainPage();
+            //подождать пока не загрузится главная страница с заголовком "Online Store"
 
             try {
                 Thread.sleep(sleepTimeMsek);
@@ -57,15 +44,13 @@ public class UT4CheckCartApp {
                 ex.printStackTrace();
             }
 
-            prodList = PageParams.getWebDriver().findElements(By.cssSelector("li.product"));
-            // определение списка товаров на главной странице
+            prodList = mainLiteCartPage.Css_li_product_Elements; // определение списка товаров на главной странице
 
             p=1; j=0;
             while(p>0) {
                 k=1; k1=1;
                 productUnit = prodList.get(j);    // выбираем конкретный продукт
-                prodName[i]=productUnit.findElement(By.cssSelector("div.name")).getText();
-                // получаем имя продукта
+                prodName[i] = mainLiteCartPage.getCss_div_name_Text(productUnit); // получаем имя продукта
 
                 if(i==1) { // для 2-го товара
                     // проверяем, что выбранный товар не совпадает с предыдущим
@@ -83,47 +68,37 @@ public class UT4CheckCartApp {
             }
 
             productUnit.click(); //щелкаем по странице продукта
-            PageParams.getWebDriverWait().until(titleContains(prodName[i]));
+            mainLiteCartPage.waitUntilProdNameStr(prodName[i]);
 
+            Cart = mainLiteCartPage.getPresenceOfElementLocatedById_cart(); // нашли корзину
 
-            Cart = PageParams.getWebDriverWait().until(presenceOfElementLocated(By.id("cart"))); // нашли корзину
-            k=prodName[i].compareToIgnoreCase("Yellow Duck");
+            k = prodName[i].compareToIgnoreCase("Yellow Duck");
             // Проверяем, что выбранный товар не Yellow Duck - требует доп. обработки
             if (k==0) {  // Обработка Yellow Duck - выбираем размер
-                new Select(PageParams.getWebDriver().findElement(By.name("options[Size]"))).selectByVisibleText("Small");
+                new Select(mainLiteCartPage.byName_optionsSize).selectByVisibleText("Small");
             }
 
-            try {
-                Thread.sleep(sleepTimeMsek);
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
-            }
+            pageParams.ThreadSleep(sleepTimeMsek);
 
-            PageParams.getWebDriver().findElement(By.name("add_cart_product")).click();
-            // добавляем продукт в корзину
+            mainLiteCartPage.byName_add_cart_product.click();  // добавляем продукт в корзину
 
-            PageParams.getWebDriverWait().until(textToBePresentInElement(
-                    Cart.findElement(By.cssSelector("span.quantity")),
-                    Integer.toString(i+1)));
+            mainLiteCartPage.waitUntil_textToBePresentInElement_Css_span_quantity(Cart, (i+1));
             // ждем изменения количества
         }
 
-        PageParams.getWebDriver().get("http://" + PageParams.getCurrentIpStr() + ":8080/litecart/en/"); //открыть главную страницу магазина
+        mainLiteCartPage.open().waitUntilMainPage();
+        //подождать пока не загрузится главная страница с заголовком "Online Store"
 
-        PageParams.getWebDriver().findElement(By.id("cart")).click(); // открываем корзину
-        PageParams.getWebDriverWait().until(titleContains("Checkout")); // ожидаем открытия страницы корзины
+        mainLiteCartPage.byId_cart.click(); // открываем корзину
+        mainLiteCartPage.waitUntil_Checkout(); // ожидаем открытия страницы корзины
 
         for(int n=1; n<=prodCartCount; n++) {
-            prodTable = PageParams.getWebDriverWait().until(presenceOfElementLocated(By.id("order_confirmation-wrapper")));
+            prodTable = mainLiteCartPage.getPresenceOfElementLocatedById_order_conf_wrapper();
             // находим таблицу товаров в корзине
 
-            try {
-                Thread.sleep(sleepTimeMsek);
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
-            }
+            pageParams.ThreadSleep(sleepTimeMsek);
 
-            prodList = PageParams.getWebDriver().findElements(By.cssSelector("li.shortcut"));
+            prodList = mainLiteCartPage.Css_li_shortcut_Elements;
             if(prodList.size()>0) {
             /*
               Поскольку изначально картинки продуктов на экране сменяются, мы просто определяем
@@ -133,14 +108,12 @@ public class UT4CheckCartApp {
                 prodList.get(0).click();
             }
 
-            PageParams.getWebDriver().findElement(By.name("remove_cart_item")).click();
-            // кликнуть по кнопке удаления товара Remove
-            PageParams.getWebDriverWait().until(stalenessOf(prodTable));  // ожидаем обновления таблицы со списком товаров
-
+            mainLiteCartPage.byName_remove_cart_item.click();          // кликнуть по кнопке удаления товара Remove
+            mainLiteCartPage.waitUntilStalenessOfProdTable(prodTable); // ожидаем обновления таблицы со списком товаров
         }
 
-        PageParams.getWebDriver().get("http://" + PageParams.getCurrentIpStr() + ":8080/litecart/en/");
-        PageParams.getWebDriverWait().until(titleContains("Online Store"));
+        mainLiteCartPage.open().waitUntilMainPage();
+        //подождать пока не загрузится главная страница с заголовком "Online Store"
     }
 }
 
