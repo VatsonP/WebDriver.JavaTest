@@ -1,7 +1,6 @@
 package ru.stqa.training.selenium.tests;
 
 import org.junit.Test;
-import org.openqa.selenium.WebElement;
 import ru.stqa.training.selenium.driverbase.DriverBaseParams;
 import ru.stqa.training.selenium.testapp.UT4CheckCartApp;
 import ru.stqa.training.selenium.testbase.TestBase;
@@ -9,7 +8,6 @@ import ru.stqa.training.selenium.testbase.TestBase;
 
 
 public class UT4CheckCartTests extends TestBase {
-
 
     private UT4CheckCartApp ut4CheckCartApp;
 
