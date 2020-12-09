@@ -27,46 +27,38 @@ public class FirstDemoTests extends TestBase {
         setApp(new FirstDemoApp() );
     }
 
+    @Before
+    public void initBefore() {
+        getApp().initPages(getDrvBase());
+    }
 
     @Test
-    public void my1stFirstDemo() {
-        getApp().initPages(getDrvBase());
-
+    public void my01Test() {
         getApp().FirstTest();
     }
 
     @Test
-    public void my2ndTest() {
-        getApp().initPages(getDrvBase());
-
+    public void my02Test() {
         getApp().SecondTest();
     }
 
     @Test
-    public void my3rdTest() {
-        getApp().initPages(getDrvBase());
-
+    public void my03Test() {
         getApp().ThirdTest();
     }
 
     @Test
-    public void my4thTest() {
-        getApp().initPages(getDrvBase());
-
+    public void my04Test() {
         getApp().FourthTest();
     }
 
     @Test
-    public void my5thTest() {
-        getApp().initPages(getDrvBase());
-
+    public void my05Test() {
         getApp().FifthTest();
     }
 
     @Test
-    public void my6thTest() {
-        getApp().initPages(getDrvBase());
-
+    public void my06Test() {
         getApp().SixthTest_myCheckStiker();
     }
 
