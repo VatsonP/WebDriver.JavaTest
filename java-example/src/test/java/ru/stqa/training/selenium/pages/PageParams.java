@@ -1,5 +1,6 @@
 package ru.stqa.training.selenium.pages;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -34,5 +35,13 @@ public class PageParams {
 
     public void clickElement(WebElement element) {
         getDriverBase().clickElement(element);
+    }
+
+    public boolean isElementPresent (WebDriver webDriver, By locator){
+         return  getDriverBase().isElementPresent(webDriver, locator);
+    }
+
+    public void checkAndPrintAttributeByName(WebElement element, String attributeName) {
+        getDriverBase().checkAndPrintAttributeByName (element, attributeName);
     }
 }
