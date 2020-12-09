@@ -1,7 +1,5 @@
 package ru.stqa.training.selenium.testapp;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import ru.stqa.training.selenium.driverbase.DriverBase;
 import ru.stqa.training.selenium.pages.PageParams;
@@ -11,12 +9,6 @@ import ru.stqa.training.selenium.pages.AdminLeftMenuPage;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-
-import org.openqa.selenium.support.ui.ExpectedCondition;
-
-import static org.openqa.selenium.support.ui.ExpectedConditions.titleContains;
-import static org.openqa.selenium.support.ui.ExpectedConditions.titleIs;
-
 
 
 public class UT3CheckNewTabsApp {
