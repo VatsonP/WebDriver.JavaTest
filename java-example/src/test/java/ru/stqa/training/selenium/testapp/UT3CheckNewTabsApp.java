@@ -48,7 +48,7 @@ public class UT3CheckNewTabsApp {
         LoginAs("admin", "admin");//открыть страницу и выполнить коннект под пользователем
 
         //открыть страницу со списком стран
-        adminLeftMenuPage.OpenCountries();
+        adminLeftMenuPage.openCountries();
         adminLeftMenuPage.waitUntilCountries(); // ждем загрузки страницы
 
         //определение списка строк в таблице стран

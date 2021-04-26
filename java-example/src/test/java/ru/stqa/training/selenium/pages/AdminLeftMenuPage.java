@@ -34,6 +34,41 @@ public class AdminLeftMenuPage extends Page {
         return menuPoint.findElements(By.cssSelector("[id^=doc-]"));
     }
 
+    //-- for UT5CheckCountriesApp ----------------------------------------------
+    @FindBy(css="[name=geo_zones_form] .row")
+    public List<WebElement> Css_geo_zones_row_Elements;
+
+    @FindBy(css="[id=table-zones] tr")
+    public List<WebElement> Css_id_table_zones_tr_Elements;
+
+    public AdminLeftMenuPage OpenGeoZones()
+    {
+        // открываем страницу просмотра географических зон
+        PageParams.getWebDriver().get("http://" + PageParams.getCurrentIpStr() + ":8080/litecart/admin/?app=geo_zones&doc=geo_zones");
+
+        return this;
+    }
+
+    public WebElement Row_Css_a_Element(WebElement row)
+    {
+        return row.findElement(By.cssSelector("a"));
+    }
+
+    public WebElement CountryRow_Css_td_nth_child6_Element(WebElement countryRow)
+    {
+        return countryRow.findElement(By.cssSelector("td:nth-child(6)"));
+    }
+
+    public WebElement ZoneRow_Css_td_nth_child3_Element(WebElement zoneRow)
+    {
+        return zoneRow.findElement(By.cssSelector("td:nth-child(3)"));
+    }
+
+    public WebElement ZoneRow_Css_id_table_zones_td_nth_child3_Element(WebElement zoneRow)
+    {
+        return zoneRow.findElement(By.cssSelector("[id=table-zones] tr td:nth-child(3) [selected=selected]"));
+    }
+
     //-- for UT3CheckNewTabsApp ----------------------------------------------
     @FindBy(css="[name=countries_form] .row")
     public List<WebElement> Css_countries_row_Elements;
@@ -96,7 +131,7 @@ public class AdminLeftMenuPage extends Page {
         return this;
     }
 
-    public AdminLeftMenuPage OpenCountries()
+    public AdminLeftMenuPage openCountries()
     {
         //XAMPP litecart admin page - "http://" + CurrentIpStr + ":8080/litecart/admin/?app=countries&doc=countries"
         PageParams.getWebDriver().get("http://" + PageParams.getCurrentIpStr() + ":8080/litecart/admin/?app=countries&doc=countries");
