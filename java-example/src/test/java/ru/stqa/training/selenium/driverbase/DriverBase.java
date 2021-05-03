@@ -441,4 +441,13 @@ public class DriverBase implements DriverDefault {
         clickElement(findElm(webDriver, locator));
     }
 
+    public void findElmAndClear(WebDriver webDriver, By locator)
+    {
+        findElm(webDriver, locator).clear();
+    }
+
+    public void findElmAndSendKeys(WebDriver webDriver, By locator, String keyText) {
+        findElm(webDriver, locator).sendKeys(keyText);
+    }
+
 }

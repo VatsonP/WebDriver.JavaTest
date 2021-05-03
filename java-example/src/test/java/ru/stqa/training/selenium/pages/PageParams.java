@@ -37,11 +37,27 @@ public class PageParams {
         getDriverBase().clickElement(element);
     }
 
+    public void findElmAndClick(By locator) {
+        getDriverBase().findElmAndClick(getWebDriver(), locator);
+    }
+
+    public void findElmAndClear(By locator) {
+        getDriverBase().findElmAndClear(getWebDriver(), locator);
+    }
+
+    public void findElmAndSendKeys(By locator, String keyText) {
+        getDriverBase().findElmAndSendKeys(getWebDriver(), locator, keyText);
+    }
+
     public boolean isElementPresent (WebDriver webDriver, By locator){
          return  getDriverBase().isElementPresent(webDriver, locator);
     }
 
     public void checkAndPrintAttributeByName(WebElement element, String attributeName) {
         getDriverBase().checkAndPrintAttributeByName (element, attributeName);
+    }
+
+    public String getFullDateStrForBrowserDateControl(int yyyy, int mm, int dd) {
+        return getDriverBase().getFullDateStrForBrowserDateControl(yyyy, mm, dd);
     }
 }
