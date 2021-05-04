@@ -29,7 +29,8 @@ public class AdminNewProdPage extends Page {
     }
 
     public class CurDateTime {
-        public Calendar calendar;
+        private Calendar calendar;
+
         public int yyyy;
         public int mm;
         public int dd;
@@ -52,9 +53,9 @@ public class AdminNewProdPage extends Page {
 
     public String GetProdPrefix(CurDateTime curDateTime)
         { 
-            return PaddingLeft(curDateTime.h) +
-                   PaddingLeft(curDateTime.m) +
-                   PaddingLeft(curDateTime.s);
+            return pageParams.PaddingLeft(curDateTime.h) +
+                   pageParams.PaddingLeft(curDateTime.m) +
+                   pageParams.PaddingLeft(curDateTime.s);
         }
 
     public String GetProdValidFrom(CurDateTime curDateTime)
@@ -119,21 +120,6 @@ public class AdminNewProdPage extends Page {
         PageParams.getWebDriverWait().until(titleIs("My Store"));
         //подождать пока не загрузится страница с заголовком "My Store"
         return this;
-    }
-
-    private static String PaddingLeft(int intS)
-    {
-        return PaddingLeft(intS, 2);
-    }
-
-    private static String PaddingLeft(int intS, int totalWidth)
-    {
-        return PaddingLeft(intS, totalWidth, '0');
-    }
-
-    private static String PaddingLeft(int intS, int totalWidth, char paddingChar)
-    {
-        return String.format("%" + paddingChar + totalWidth + "d", intS);
     }
 
 }

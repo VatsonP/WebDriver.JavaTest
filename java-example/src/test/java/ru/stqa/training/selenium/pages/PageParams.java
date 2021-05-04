@@ -24,7 +24,6 @@ public class PageParams {
         this.drvBase      = drvBase;
     }
 
-
     public void ThreadSleep(long MSec) {
         getDriverBase().ThreadSleep(MSec);
     }
@@ -60,4 +59,17 @@ public class PageParams {
     public String getFullDateStrForBrowserDateControl(int yyyy, int mm, int dd) {
         return getDriverBase().getFullDateStrForBrowserDateControl(yyyy, mm, dd);
     }
+
+    public String PaddingLeft(int intS) {
+        return getDriverBase().PaddingLeft(intS);
+    }
+
+    public String PaddingLeft(int intS, int totalWidth) {
+        return getDriverBase().PaddingLeft(intS, totalWidth);
+    }
+
+    public String PaddingLeft(int intS, int totalWidth, char paddingChar) {
+        return getDriverBase().PaddingLeft(intS, totalWidth, paddingChar);
+    }
+
 }
