@@ -1,20 +1,13 @@
 package ru.stqa.training.selenium.testapp;
 
-import org.junit.Assert;
-import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import ru.stqa.training.selenium.driverbase.DriverBase;
 import ru.stqa.training.selenium.pages.PageParams;
 import ru.stqa.training.selenium.pages.AdminPanelLoginPage;
 import ru.stqa.training.selenium.pages.AdminNewProdPage;
 
 import java.util.Calendar;
-import java.util.List;
-
-import static org.openqa.selenium.support.ui.ExpectedConditions.titleIs;
 
 
 public class UT7CheckNewProductApp {
