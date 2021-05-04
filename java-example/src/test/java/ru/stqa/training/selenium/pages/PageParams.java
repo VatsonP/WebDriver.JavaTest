@@ -49,8 +49,8 @@ public class PageParams {
         getDriverBase().findElmAndSendKeys(getWebDriver(), locator, keyText);
     }
 
-    public boolean isElementPresent (WebDriver webDriver, By locator){
-         return  getDriverBase().isElementPresent(webDriver, locator);
+    public boolean isElementPresent (By locator){
+         return  getDriverBase().isElementPresent(getWebDriver(), locator);
     }
 
     public void checkAndPrintAttributeByName(WebElement element, String attributeName) {

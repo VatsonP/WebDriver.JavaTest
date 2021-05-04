@@ -67,7 +67,7 @@ public class FirstDemoApp {
         //Пример исключения NoSuchElementException - eсли элемент отсутствует в DOM на момент вызова
         //DriverBase.isElementPresent(driver, By.name(searchingElementName), true, 1);
 
-        if (pageParams.isElementPresent(PageParams.getWebDriver(), By.name(searchingElementName)) ) {
+        if (pageParams.isElementPresent(By.name(searchingElementName)) ) {
 
             PageParams.getWebDriver().findElement(By.name(searchingElementName)).sendKeys("webdriver");
             PageParams.getWebDriver().findElement(By.name(searchingElementName)).sendKeys(Keys.RETURN);
