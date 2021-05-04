@@ -26,7 +26,7 @@ public class UT3CheckNewTabsTests extends TestBase {
 
 
     @Test
-    public void TestMyLeftMenuClick() {
+    public void TestMyCheckNewTabs() {
         getApp().initPages(getDrvBase());
 
         getApp().myCheckNewTabs();
