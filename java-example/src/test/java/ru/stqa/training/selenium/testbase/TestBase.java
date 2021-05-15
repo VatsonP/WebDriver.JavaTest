@@ -6,6 +6,7 @@ import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
 import ru.stqa.training.selenium.driverbase.DriverBase;
+import ru.stqa.training.selenium.driverbase.DriverBaseReal;
 import ru.stqa.training.selenium.driverbase.DriverBaseParams;
 
 import java.net.MalformedURLException;
@@ -17,7 +18,7 @@ public abstract class TestBase
     protected DriverBase getDrvBase() { return drvBase; }
 
     public TestBase(DriverBaseParams driverBaseParams) {
-        drvBase = new DriverBase(driverBaseParams);
+        drvBase = new DriverBaseReal(driverBaseParams);
     }
 
     @Rule
@@ -34,10 +35,7 @@ public abstract class TestBase
         };
     }
 
-    protected void watcherStarting (Description description) {
-        drvBase.watcherStarting(description);
-
-    }
+    protected void watcherStarting (Description description) { drvBase.watcherStarting(description); }
     protected void watcherFinished (Description description) {
         drvBase.watcherFinished(description);
     }
