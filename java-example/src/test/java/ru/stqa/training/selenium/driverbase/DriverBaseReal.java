@@ -6,6 +6,8 @@ import org.junit.runner.Description;
 
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.*;
+import org.openqa.selenium.firefox.*;
+
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.ie.InternetExplorerOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -26,6 +28,9 @@ import java.util.concurrent.TimeUnit;
 
 
 public class DriverBaseReal extends DriverBase {
+
+    public static final String EmptyStr = "";
+    public static final String UserProfileFolderPath = System.getProperty("user.home");
 
     public DriverBaseReal(DriverBaseParams driverBaseParams)
     {
@@ -128,21 +133,28 @@ public class DriverBaseReal extends DriverBase {
         }
         else
             if (driverType == WebDriverType.Chrome) {
+                /*
+                 Use this to PREVENT warning: "Only local connections are allowed."
+                 This will basically set whitelist all IP's, be careful with it for production enviornments,
+                 but you should be presented with a verbose warning: "All remote connections are allowed. Use a whitelist instead!"
+                */
+                System.setProperty("webdriver.chrome.whitelistedIps", "");
+
                 webDriver = new ChromeDriver(
                                 new ChromeDriverService.Builder()
                                     .usingDriverExecutable(new File ("C:\\Tools\\chromedriver.exe")).build(),
                                 getChromeOptions());
                 //webDriver.get("chrome://settings/clearBrowserData");
-                //webDriver.findElement(By.xpath("//settings-ui")).sendKeys(Keys.RETURN);
             }
             else
                 if (driverType == WebDriverType.Firefox) {
+                    System.setProperty("webdriver.gecko.driver", "C:\\Tools\\geckodriver.exe");
                     webDriver = new FirefoxDriver(getFirefoxOptions());
-                }
-                else {
-                    webDriver = new InternetExplorerDriver(getIEOptions());
-                    setWebDriverType(WebDriverType.IE);
-                }
+            }
+            else {
+                webDriver = new InternetExplorerDriver(getIEOptions());
+                setWebDriverType(WebDriverType.IE);
+            }
 
         webDriver.manage().deleteAllCookies();
         printDriverCapabilities(webDriver);
@@ -167,7 +179,13 @@ public class DriverBaseReal extends DriverBase {
     {
         ChromeOptions chromeOptions = new ChromeOptions();
         //--Указан путь к последней версии Chrome в portable варианте
-        chromeOptions.setBinary("C:\\Program Files (x86)\\Google\\Chrome\\Application\\Chrome.exe");
+        //chromeOptions.setBinary("C:\\Program Files (x86)\\Google\\Chrome\\Application\\Chrome.exe");
+        String path = getChromePathStr();
+        if (!path.equals(EmptyStr)) {
+            chromeOptions.setBinary(path);
+        } else {
+            System.out.println("Chrome.exe file could not be found in method getChromePathStr().");
+        }
         //--Задаем setCapability
         chromeOptions.setCapability("unexpectedAlertBehavior", "dismiss");
         //--Задаем setCapability
@@ -176,25 +194,83 @@ public class DriverBaseReal extends DriverBase {
         //--Задаем опции коммандной строки соотв. браузера
         //options.addArguments("start-fullscreen");
         //Use custom profile(also called user data directory)
-        chromeOptions.addArguments("user-data-dir=c:\\Users\\AdminVadim\\AppData\\Local\\Google\\Chrome\\User Data");
+        chromeOptions.addArguments("user-data-dir=" + System.getProperty("user.home") + "\\AppData\\Local\\Google\\Chrome\\User Data");
 
         return chromeOptions;
+    }
+
+    private String getChromePathStr()
+    {
+        String path_usr = System.getProperty("user.home") + "\\Local Settings\\Application Data\\Google\\Chrome\\Application\\chrome.exe";
+        String path_x86 = "C:\\Program Files (x86)\\Google\\Chrome\\Application\\Chrome.exe";
+        String path_x64 = "C:\\Program Files\\Google\\Chrome\\Application\\Chrome.exe";
+
+        if ((new File(path_usr)).exists()) {
+            return path_usr;
+        }
+        else if((new File(path_x86)).exists()) {
+            return path_x86;
+        }
+        else if ((new File(path_x64)).exists()) {
+            return path_x64;
+        }
+        else
+            return EmptyStr;
     }
 
     private FirefoxOptions getFirefoxOptions()
     {
         FirefoxOptions firefoxOptions = new FirefoxOptions();
-        firefoxOptions.setBinary("C:\\Program Files\\Mozilla Firefox\\firefox.exe");
+        String path = getFirefoxPathStr();
+        if (!path.equals(EmptyStr)) {
+            firefoxOptions.setBinary(path);
+        } else {
+            System.out.println("Firefox.exe file could not be found in method getChromePathStr().");
+        }
         //--Задаем setCapability
         firefoxOptions.setCapability("acceptInsecureCerts", false);
         //--Задаем опции коммандной строки соотв. браузера
         firefoxOptions.addArguments("-private-window");
+
         //установка профиля пользователя для запуска браузера
-        //File ffProfileDir = new File("C:\\Users\\AdminVadim\\AppData\\Local\\Mozilla\\Firefox\\Profiles\\ltebh6bi.default");
-        //FirefoxProfile ffProfile = new FirefoxProfile(ffProfileDir);
-        //firefoxOptions.setProfile(ffProfile);
+        setFirefoxProfile(firefoxOptions);
 
         return firefoxOptions;
+    }
+
+    private String getFirefoxPathStr()
+    {
+        String path_x86 = "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe";
+        String path_x64 = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
+
+        if((new File(path_x86)).exists()) {
+            return path_x86;
+        }
+        else if ((new File(path_x64)).exists()) {
+            return path_x64;
+        }
+        else
+            return EmptyStr;
+    }
+    private void setFirefoxProfile(FirefoxOptions firefoxOptions)
+    {
+        //установка профиля пользователя для запуска браузера
+        String firefoxProfileFolderPath = UserProfileFolderPath + "\\AppData\\Local\\Mozilla\\Firefox\\Profiles";
+        String[] profileDirectories = new File(firefoxProfileFolderPath).list((dir, name) -> name.endsWith(".default") && new File(dir, name).isDirectory());
+        String notFoundMessage = "Firefox Profile directory could Not be found";
+        try {
+            if (!profileDirectories[0].isEmpty()) {
+                String profileDirectory = Paths.get(firefoxProfileFolderPath, profileDirectories[0]).toString();
+                File ffProfileDir = new File(profileDirectory);
+                FirefoxProfile firefoxProfile = new FirefoxProfile(ffProfileDir);
+                firefoxOptions.setProfile(firefoxProfile);
+            }
+            else
+                System.out.println(notFoundMessage + " (profileDirectories[0] = EmptyStr).");
+        }
+        catch (NullPointerException e) {
+            System.out.println(notFoundMessage + " (profileDirectories[0] have null value).");
+        }
     }
 
     protected WebDriver newRemoteWebDriverSetOptions(URL remoteAddress, WebDriverType driverType)
@@ -208,12 +284,18 @@ public class DriverBaseReal extends DriverBase {
         }
         else
         if (driverType == WebDriverType.Chrome) {
+            /*
+             Use this to PREVENT warning: "Only local connections are allowed."
+             This will basically set whitelist all IP's, be careful with it for production enviornments,
+             but you should be presented with a verbose warning: "All remote connections are allowed. Use a whitelist instead!"
+            */
+            System.setProperty("webdriver.chrome.whitelistedIps", "");
             webDriver = new RemoteWebDriver(remoteAddress, getRemoteChromeOptions());
             //webDriver.get("chrome://settings/clearBrowserData");
-            //webDriver.findElement(By.xpath("//settings-ui")).sendKeys(Keys.RETURN);
         }
         else
         if (driverType == WebDriverType.Firefox) {
+            System.setProperty("webdriver.gecko.driver", "C:\\Tools\\geckodriver.exe");
             webDriver = new RemoteWebDriver(remoteAddress, getRemoteFirefoxOptions());
         }
         else {
@@ -262,7 +344,12 @@ public class DriverBaseReal extends DriverBase {
         chromeOptions.setCapability("selenoid:options", map);
 
         //--Указан путь к последней версии Chrome в portable варианте
-        //chromeOptions.setBinary("C:\\Program Files (x86)\\Google\\Chrome\\Application\\Chrome.exe");
+        String path = getChromePathStr();
+        if (!path.equals(EmptyStr)) {
+            chromeOptions.setBinary(path);
+        } else {
+            System.out.println("Chrome.exe file could not be found in method getChromePathStr().");
+        }
         //--Задаем setCapability
         chromeOptions.setCapability("unexpectedAlertBehavior", "dimiss");
         //--Задаем setCapability
@@ -271,7 +358,7 @@ public class DriverBaseReal extends DriverBase {
         //--Задаем опции коммандной строки соотв. браузера
         //options.addArguments("start-fullscreen");
         //Use custom profile(also called user data directory)
-        //chromeOptions.addArguments("user-data-dir=c:\\Users\\AdminVadim\\AppData\\Local\\Google\\Chrome\\User Data");
+        chromeOptions.addArguments("user-data-dir=" + System.getProperty("user.home") + "\\AppData\\Local\\Google\\Chrome\\User Data");
 
         return chromeOptions;
     }
@@ -296,16 +383,20 @@ public class DriverBaseReal extends DriverBase {
         map.put("videoScreenSize", "1280x720");
         map.put("screenResolution", "1920x1080x24");
         firefoxOptions.setCapability("selenoid:options", map);
-
-        //firefoxOptions.setBinary("C:\\Program Files\\Mozilla Firefox\\firefox.exe");
+        //Set firefox binary path
+        String path = getFirefoxPathStr();
+        if (!path.equals(EmptyStr)) {
+            firefoxOptions.setBinary(path);
+        } else {
+            System.out.println("Chrome.exe file could not be found in method getChromePathStr().");
+        }
         //--Задаем setCapability
         firefoxOptions.setCapability("acceptInsecureCerts", false);
         //--Задаем опции коммандной строки соотв. браузера
         //firefoxOptions.addArguments("-private-window");
+
         //установка профиля пользователя для запуска браузера
-        //File ffProfileDir = new File("C:\\Users\\AdminVadim\\AppData\\Local\\Mozilla\\Firefox\\Profiles\\ltebh6bi.default");
-        //FirefoxProfile ffProfile = new FirefoxProfile(ffProfileDir);
-        //firefoxOptions.setProfile(ffProfile);
+        setFirefoxProfile(firefoxOptions);
 
         return firefoxOptions;
     }
