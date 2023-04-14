@@ -69,7 +69,8 @@ public class DriverBaseReal extends DriverBase {
     public void startBefore() throws MalformedURLException {
 
         TestRunType   tRunType =  TestRunType.Local;
-        WebDriverType wbType   = WebDriverType.Chrome;
+        //SET initial WebDriverType
+        WebDriverType wbType   = WebDriverType.IE;
 
         setTestRunType(tRunType);
         setWebDriverType(wbType);
@@ -129,12 +130,13 @@ public class DriverBaseReal extends DriverBase {
         setWebDriverType(driverType);
 
         if (driverType == WebDriverType.IE) {
+            System.setProperty("webdriver.ie.driver", "C:\\Tools\\IEDriverServer.exe");
             webDriver = new InternetExplorerDriver(getIEOptions());
         }
         else
             if (driverType == WebDriverType.Chrome) {
                 /*
-                 Use this to PREVENT warning: "Only local connections are allowed."
+                 Use System.setProperty(...) this to PREVENT warning: "Only local connections are allowed."
                  This will basically set whitelist all IP's, be careful with it for production enviornments,
                  but you should be presented with a verbose warning: "All remote connections are allowed. Use a whitelist instead!"
                 */
@@ -163,13 +165,15 @@ public class DriverBaseReal extends DriverBase {
 
     private InternetExplorerOptions getIEOptions()
     {
-        DesiredCapabilities caps = new DesiredCapabilities();
-        caps.setCapability("unexpectedAlertBehavior", "dismiss");
+        InternetExplorerOptions ieOptions = new InternetExplorerOptions();
+        ieOptions.setCapability("unexpectedAlertBehavior", "dismiss");
         //установка опций для игнорировния отличия масштаба от 100%
-        caps.setCapability(InternetExplorerDriver.IGNORE_ZOOM_SETTING, true);
+        ieOptions.setCapability(InternetExplorerDriver.IGNORE_ZOOM_SETTING, true);
         //установка опций для игнорировния отличия настройки защищенного режима в разных зонах (не надежная работа)
-        //caps.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
-        InternetExplorerOptions ieOptions = new InternetExplorerOptions(caps);
+        ieOptions.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
+        //Set the ie.usePerProcessProxy option to true. This option tells the Internet Explorer WebDriver to use
+        //the system proxy settings and bypass the restriction on remote URLs ("Only local connections are allowed").
+        ieOptions.setCapability(InternetExplorerDriver.IE_USE_PER_PROCESS_PROXY, true);
         ieOptions.setUnhandledPromptBehaviour(UnexpectedAlertBehaviour.DISMISS);
 
         return ieOptions;
