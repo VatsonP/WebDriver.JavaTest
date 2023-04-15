@@ -22,6 +22,45 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
+# Gradle files
+.gradle/
+/build/
+
+# IDE files
+.idea/
+*.iml
+*.ipr
+*.iws
+*.log
+
+# Compiled Java classes
+*.class
+
+# Test reports
+test-results/
+
+# Dependency lock files
+gradle.lockfile
+
+# Eclipse files
+*.project
+*.classpath
+.settings/
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+
+# Intellij files
+*.idea/workspace.xml
+*.idea/tasks.xml
+*.idea/dictionaries
+*.idea/vcs.xml
+*.idea/jsLibraryMappings.xml
+
 # My Add Settings: Log/*.txt and screenshot/*.png
 java-example/Log/
 java-example/screenshot/
