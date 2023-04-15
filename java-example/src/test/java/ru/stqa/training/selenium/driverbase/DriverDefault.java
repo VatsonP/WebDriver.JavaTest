@@ -62,7 +62,6 @@ public interface DriverDefault {
 
     default void saveBrowserLog(TestRunType testRunType, WebDriverType webDriverType, WebDriver webDrv, String currentTestName) {
 
-        if (webDriverType == WebDriverType.Chrome) {
             System.out.println("testRunType = " + testRunType.toString());
             System.out.println("driverType  = " + webDriverType.toString());
 
@@ -78,10 +77,10 @@ public interface DriverDefault {
             lw.LogWrite("testRunType", testRunType.toString());
             lw.LogWrite("driverType", webDriverType.toString());
 
-            webDrv.manage().logs().get(LogType.BROWSER).forEach(l -> lw.LogWrite("BrowserLogWrite", l.getMessage()));
+            if (webDriverType == WebDriverType.Chrome)
+                webDrv.manage().logs().get(LogType.BROWSER).forEach(l -> lw.LogWrite("BrowserLogWrite", l.getMessage()));
 
             lw.FinalLogWrite();
-        }
     }
 
     default void createBaseLogDir(Path baseFullPath) {
