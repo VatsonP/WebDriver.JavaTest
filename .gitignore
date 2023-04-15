@@ -66,3 +66,5 @@ java-example/Log/
 java-example/screenshot/
 .idea/workspace.xml
 .idea/uiDesigner.xml
+.gradle/4.10
+.gradle/buildOutputCleanup
