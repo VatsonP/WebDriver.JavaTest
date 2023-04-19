@@ -17,6 +17,7 @@ import org.openqa.selenium.remote.*;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.logging.Logs;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -37,14 +38,19 @@ public class DriverBaseReal extends DriverBase {
         super (driverBaseParams);
     }
 
-    protected void initLogListenerAndWait() {
+    //must be initialized after the WebDriver create
+    private Logs wdLogs;
+
+    protected void initLogListenerAndWait(WebDriver webDrv) {
+        wdLogs = webDrv.manage().logs();
+
         // for write log file on error
         Path baseRelativePath = Paths.get("","Log");
         Path   baseFullPath     = baseRelativePath.toAbsolutePath();
 
         createBaseLogDir(baseFullPath);
 
-        LogWriter logWriter   = new LogWriter(baseFullPath, getCurrentTestName());
+        LogWriter logWriter   = new LogWriter(wdLogs, baseFullPath, getCurrentTestName());
         logWriter.LogWrite("currentTestName", getCurrentTestName());
         logListener = new LogListener(logWriter);
 
@@ -70,7 +76,7 @@ public class DriverBaseReal extends DriverBase {
 
         TestRunType   tRunType =  TestRunType.Local;
         //SET initial WebDriverType
-        WebDriverType wbType   = WebDriverType.IE;
+        WebDriverType wbType   = WebDriverType.Chrome;
 
         setTestRunType(tRunType);
         setWebDriverType(wbType);
@@ -84,7 +90,7 @@ public class DriverBaseReal extends DriverBase {
                 driver.unregister(logListener);
             }
 
-            initLogListenerAndWait();
+            initLogListenerAndWait(driver);
             //Регистрируем наблюдатель
             driver.register(logListener);
 
@@ -106,7 +112,7 @@ public class DriverBaseReal extends DriverBase {
 
         tlDriver.set(driver);
 
-        initLogListenerAndWait();
+        initLogListenerAndWait(driver);
         //Регистрируем наблюдатель
         driver.register(logListener);
 
@@ -117,7 +123,7 @@ public class DriverBaseReal extends DriverBase {
 
     //After
     public void stopAfter() {
-        saveBrowserLog(getTestRunType(), getWebDriverType(), driver, getCurrentTestName());
+        saveBrowserLog(getTestRunType(), getWebDriverType(), wdLogs, getDriverCapabilities(driver), getCurrentTestName());
     }
 
 

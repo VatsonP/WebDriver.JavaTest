@@ -82,8 +82,7 @@ public abstract class DriverBase implements DriverDefault {
             currentTestName = newCurrentTestName;
     }
 
-    protected abstract void initLogListenerAndWait();
-
+    protected abstract void initLogListenerAndWait(WebDriver webDrv);
 
     public abstract void watcherStarting (Description description);
     public abstract void watcherFinished (Description description);

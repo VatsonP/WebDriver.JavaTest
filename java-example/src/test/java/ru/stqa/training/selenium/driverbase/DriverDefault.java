@@ -20,6 +20,7 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.support.events.AbstractWebDriverEventListener;
+import org.openqa.selenium.logging.Logs;
 
 import java.io.File;
 import java.io.IOException;
@@ -60,8 +61,8 @@ public interface DriverDefault {
         }
     }
 
-    default void saveBrowserLog(TestRunType testRunType, WebDriverType webDriverType, WebDriver webDrv, String currentTestName) {
-
+    default void saveBrowserLog(TestRunType testRunType, WebDriverType webDriverType,
+                                Logs wdLogs, Capabilities wdCapabilities, String currentTestName) {
             System.out.println("testRunType = " + testRunType.toString());
             System.out.println("driverType  = " + webDriverType.toString());
 
@@ -71,14 +72,13 @@ public interface DriverDefault {
 
             createBaseLogDir(baseFullPath);
 
-            LogWriter lw = new LogWriter(baseFullPath, currentTestName);
+            LogWriter lw = new LogWriter(wdLogs, baseFullPath, currentTestName);
             lw.LogWrite("currentTestName", currentTestName);
-            lw.LogWrite("Capabilities", getDriverCapabilities(webDrv).toString());
+            lw.LogWrite("Capabilities", wdCapabilities.toString());
             lw.LogWrite("testRunType", testRunType.toString());
             lw.LogWrite("driverType", webDriverType.toString());
 
-            if (webDriverType == WebDriverType.Chrome)
-                webDrv.manage().logs().get(LogType.BROWSER).forEach(l -> lw.LogWrite("BrowserLogWrite", l.getMessage()));
+            lw.saveCurLogs(webDriverType, LogType.BROWSER);
 
             lw.FinalLogWrite();
     }

@@ -2,6 +2,9 @@ package ru.stqa.training.selenium.driverbase;
 
 import javafx.util.converter.DateTimeStringConverter;
 
+import org.openqa.selenium.logging.LogType;
+import org.openqa.selenium.logging.Logs;
+
 import java.io.*;
 import java.io.File;
 import java.nio.file.Files;
@@ -11,13 +14,15 @@ import java.util.Date;
 
 public class LogWriter
 {
+    private Logs           DriverLogs;
     private File           CurLogFolder;
     private String         CurrentTestName;
     private String         CurrentFileName;
     private FileWriter     fw;
     private String         rn      = "\r\n";
 
-    private void Constructor (Path curLogPath, String currentTestName, String currentFileName){
+    private void Constructor (Logs driverLogs, Path curLogPath, String currentTestName, String currentFileName){
+        DriverLogs      = driverLogs;
         CurrentTestName = currentTestName;
         CurrentFileName = currentFileName;
 
@@ -33,13 +38,13 @@ public class LogWriter
         CurLogFolder    = curLogFolder;
     }
 
-    public LogWriter(Path curLogPath, String currentTestName) {
-        Constructor(curLogPath, currentTestName, currentTestName);
+    public LogWriter(Logs driverLogs, Path curLogPath, String currentTestName) {
+        Constructor(driverLogs, curLogPath, currentTestName, currentTestName);
     }
 
-    public LogWriter(Path curLogPath, String currentTestName, String currentFileName)
+    public LogWriter(Logs driverLogs, Path curLogPath, String currentTestName, String currentFileName)
     {
-        Constructor(curLogPath, currentTestName, currentFileName);
+        Constructor(driverLogs, curLogPath, currentTestName, currentFileName);
     }
 
     public void LogWrite(String eventName, String logMessage)
@@ -92,5 +97,20 @@ public class LogWriter
     {
         LogWrite("================================================",
                 "================================================");
+    }
+
+    public void saveCurLogs(DriverDefault.WebDriverType webDriverType, String logType)
+    {
+        if (webDriverType == DriverDefault.WebDriverType.Chrome)
+            DriverLogs.get(logType).forEach(l -> LogWrite("BrowserLogWrite", l.getMessage()));
+    }
+
+    public void saveAllCurLogs(DriverDefault.WebDriverType webDriverType)
+    {
+        saveCurLogs(webDriverType, LogType.BROWSER);
+        saveCurLogs(webDriverType, LogType.SERVER);
+        saveCurLogs(webDriverType, LogType.CLIENT);
+        saveCurLogs(webDriverType, LogType.DRIVER);
+        saveCurLogs(webDriverType, LogType.PROFILER);
     }
 }
