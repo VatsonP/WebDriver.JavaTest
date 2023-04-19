@@ -64,7 +64,8 @@ local.properties
 # My Add Settings: Log/*.txt and screenshot/*.png
 java-example/Log/
 java-example/screenshot/
+java-example/build/reports/
 .idea/workspace.xml
 .idea/uiDesigner.xml
-.gradle/4.10
-.gradle/buildOutputCleanup
+.gradle/4.10/
+.gradle/buildOutputCleanup/
