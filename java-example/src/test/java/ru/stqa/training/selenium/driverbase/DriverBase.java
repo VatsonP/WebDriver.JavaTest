@@ -36,25 +36,30 @@ public abstract class DriverBase implements DriverDefault {
 
     protected DriverBaseParams driverBaseParams;
 
-
     public DriverBase(DriverBaseParams driverBaseParams)
     {
         this.driverBaseParams = driverBaseParams;
     }
-
 
     private static WebDriverType webDriverType;
 
     public static WebDriverType getWebDriverType() {
         return webDriverType;
     }
+    protected void setWebDriverType() {
+        //SET default value for webDriverType
+        webDriverType = WebDriverType.Chrome;
+    }
     protected void setWebDriverType(WebDriverType newWebDriverType) {
         webDriverType = newWebDriverType;
     }
-
     private static TestRunType testRunType;
 
     protected static TestRunType getTestRunType() { return testRunType; }
+    protected void setTestRunType() {
+        //SET default value for testRunType
+        testRunType = TestRunType.Local;
+    }
     protected void setTestRunType(TestRunType newTestRunType) {
         testRunType = newTestRunType;
     }

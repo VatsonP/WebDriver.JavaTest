@@ -74,12 +74,8 @@ public class DriverBaseReal extends DriverBase {
     //Before
     public void startBefore() throws MalformedURLException {
 
-        TestRunType   tRunType =  TestRunType.Local;
-        //SET initial WebDriverType
-        WebDriverType wbType   = WebDriverType.Chrome;
-
-        setTestRunType(tRunType);
-        setWebDriverType(wbType);
+        setTestRunType();
+        setWebDriverType();
 
         setCurrentIpStr( defineCurrentIpStr(getTestRunType()) );
 
@@ -132,8 +128,6 @@ public class DriverBaseReal extends DriverBase {
     protected WebDriver newDriverSetOptions(WebDriverType driverType)
     {
         WebDriver    webDriver;
-
-        setWebDriverType(driverType);
 
         if (driverType == WebDriverType.IE) {
             System.setProperty("webdriver.ie.driver", "C:\\Tools\\IEDriverServer.exe");
@@ -286,8 +280,6 @@ public class DriverBaseReal extends DriverBase {
     protected WebDriver newRemoteWebDriverSetOptions(URL remoteAddress, WebDriverType driverType)
     {
         WebDriver    webDriver;
-
-        setWebDriverType(driverType);
 
         if (driverType == WebDriverType.IE) {
             webDriver = new RemoteWebDriver(remoteAddress, getRemoteIEOptions());

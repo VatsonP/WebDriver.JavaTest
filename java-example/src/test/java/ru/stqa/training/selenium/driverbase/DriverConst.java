@@ -15,5 +15,5 @@ public abstract class DriverConst {
     // Remote WinServer2019 with Docker "192.168.0.91"
     public  static final String remoteIpStr_WinServer2019 = "192.168.0.91";
     // Remote Ubuntu 20.4   with Docker "192.168.203.128"
-    public  static final String remoteIpStr_Ubuntu_20_4 = "192.168.203.128";
+    public  static final String remoteIpStr_Ubuntu_20_4 = "192.168.0.96";
 }
