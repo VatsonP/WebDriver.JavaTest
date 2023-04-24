@@ -6,6 +6,9 @@ import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.net.MalformedURLException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public abstract class DriverBase implements DriverDefault {
@@ -27,12 +30,14 @@ public abstract class DriverBase implements DriverDefault {
     }
 
     private static String currentIpStr;
-    // Remote WinServer2019 with Docker "192.168.0.91"
-    // Remote Ubuntu 20.4   with Docker "192.168.203.128"
+    // Remote WinServer2019 with Docker
+    // Remote Ubuntu 20.4   with Docker
     protected static void setCurrentIpStr(String value) { currentIpStr = value; }
     public static String getCurrentIpStr() {
         return currentIpStr;
     }
+
+    protected static Process selenoidProcess;
 
     protected DriverBaseParams driverBaseParams;
 
@@ -48,17 +53,15 @@ public abstract class DriverBase implements DriverDefault {
     }
     protected void setWebDriverType() {
         //SET default value for webDriverType
-        webDriverType = WebDriverType.Chrome;
+        webDriverType = driverBaseParams.defWebDriverType;
     }
-    protected void setWebDriverType(WebDriverType newWebDriverType) {
-        webDriverType = newWebDriverType;
-    }
+
     private static TestRunType testRunType;
 
     protected static TestRunType getTestRunType() { return testRunType; }
     protected void setTestRunType() {
         //SET default value for testRunType
-        testRunType = TestRunType.Local;
+        testRunType = driverBaseParams.defTestRunType;
     }
     protected void setTestRunType(TestRunType newTestRunType) {
         testRunType = newTestRunType;
@@ -68,12 +71,11 @@ public abstract class DriverBase implements DriverDefault {
         if (tRunType == TestRunType.Local)
             return driverBaseParams.getLocalHostStr();
         else
-        if (tRunType == TestRunType.Remote)
+        if ((tRunType == TestRunType.RemoteWin) || ( tRunType == TestRunType.RemoteUbuntu))
             return driverBaseParams.getLocalIpStr();
         else
             return driverBaseParams.getLocalIpStr();
     }
-
 
     private static String               currentTestName;
 
@@ -87,13 +89,15 @@ public abstract class DriverBase implements DriverDefault {
             currentTestName = newCurrentTestName;
     }
 
-    protected abstract void initLogListenerAndWait(WebDriver webDrv);
+    protected abstract void initLogListener(WebDriver webDrv);
+
+    protected abstract void initWebDriverWait(WebDriver webDrv);
 
     public abstract void watcherStarting (Description description);
     public abstract void watcherFinished (Description description);
 
     //BeforeClass
-    public static void startBeforeClass() {
+    public static void start1BeforeClass() {
         tlDriver = new ThreadLocal<>();
     }
 
@@ -104,7 +108,7 @@ public abstract class DriverBase implements DriverDefault {
     public abstract void stopAfter();
 
     //AfterClass
-    public static void stopAfterClass() {
+    public static void stop1AfterClass() {
         driver.quit();
         tlDriver.remove();
 
@@ -112,7 +116,70 @@ public abstract class DriverBase implements DriverDefault {
         tlDriver = null;
     }
 
+    public static void stop2AfterClass() {
+        // Terminate the Selenium webDriver Windows process
+        TerminateLocalSeleniumBrowsersServer(getTestRunType(), getWebDriverType());
+        // Terminate the selenoidProcess and the associated selenoid.exe Windows process
+       TerminateLocalSelenoidServerForIE(getTestRunType(), getWebDriverType());
+    }
 
+    private static void TerminateLocalSeleniumBrowsersServer(TestRunType testRunType, WebDriverType driverType)
+    {
+        List<String> processesToKill = new ArrayList<>();
+
+        switch (driverType) {
+            case IE:
+                processesToKill.add(DriverConst.ieDriverExeName);
+                break;
+
+            case Chrome:
+                if (testRunType == TestRunType.Local) {
+                    processesToKill.add(DriverConst.chromeDriverExeName);
+                }
+                break;
+
+            case Firefox:
+                if (testRunType == TestRunType.Local) {
+                    processesToKill.add(DriverConst.firefoxDriverExeName);
+                }
+                break;
+        }
+        // Terminate the associated Selenium webDriver Windows process from memory
+        try {
+            killProcesses(processesToKill);
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void TerminateLocalSelenoidServerForIE(TestRunType testRunType, WebDriverType driverType)
+    {
+        if ((testRunType != TestRunType.Local) &
+                (driverType == WebDriverType.IE) &
+                (selenoidProcess != null)
+        )
+        {
+            // Stop the selenoid process
+            if (selenoidProcess.isAlive()) {
+                selenoidProcess.destroy();
+            }
+            // Terminate the selenoid associated Windows process from memory
+            List<String> processesToKill = new ArrayList<>();
+            processesToKill.add(DriverConst.selenoidDriverExeName);
+            try {
+                killProcesses(processesToKill);
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private static void killProcesses(List<String> processNames) throws IOException, InterruptedException {
+        for (String processName : processNames) {
+            ProcessBuilder builder = new ProcessBuilder("taskkill", "/F", "/IM", processName);
+            builder.start().waitFor();
+        }
+    }
     //------------------------------------------------------------------------------------------------
 
     public String getFullDateStrForBrowserDateControl(int yyyy, int mm, int dd)

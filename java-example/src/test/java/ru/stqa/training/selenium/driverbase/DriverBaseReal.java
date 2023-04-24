@@ -26,7 +26,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-
+import java.io.IOException;
 
 public class DriverBaseReal extends DriverBase {
 
@@ -41,7 +41,7 @@ public class DriverBaseReal extends DriverBase {
     //must be initialized after the WebDriver create
     private Logs wdLogs;
 
-    protected void initLogListenerAndWait(WebDriver webDrv) {
+    protected void initLogListener(WebDriver webDrv) {
         wdLogs = webDrv.manage().logs();
 
         // for write log file on error
@@ -53,7 +53,9 @@ public class DriverBaseReal extends DriverBase {
         LogWriter logWriter   = new LogWriter(wdLogs, baseFullPath, getCurrentTestName());
         logWriter.LogWrite("currentTestName", getCurrentTestName());
         logListener = new LogListener(logWriter);
+    }
 
+    protected void initWebDriverWait(WebDriver webDrv) {
         // Для установки общих неявных ожиданий
         driver.manage().timeouts().implicitlyWait(driverBaseParams.getImplWaitTime(), TimeUnit.SECONDS);
         // Для задания явных ожиданий
@@ -76,7 +78,6 @@ public class DriverBaseReal extends DriverBase {
 
         setTestRunType();
         setWebDriverType();
-
         setCurrentIpStr( defineCurrentIpStr(getTestRunType()) );
 
         if(tlDriver.get() != null) {
@@ -86,7 +87,8 @@ public class DriverBaseReal extends DriverBase {
                 driver.unregister(logListener);
             }
 
-            initLogListenerAndWait(driver);
+            initLogListener(driver);
+            initWebDriverWait(driver);
             //Регистрируем наблюдатель
             driver.register(logListener);
 
@@ -99,16 +101,15 @@ public class DriverBaseReal extends DriverBase {
             driver = new EventFiringWebDriver(newDriverSetOptions(getWebDriverType()));
         }
         else
-        if (getTestRunType() == TestRunType.Remote) {
-            //URL
-            String uriString = "http://" + driverBaseParams.getRemoteIpStr() + ":4444/wd/hub/";
+        if ((getTestRunType() == TestRunType.RemoteWin) || (getTestRunType() == TestRunType.RemoteUbuntu)) {
             // Создаем обертку класса WebDriver для последующего сохранения  логов
-            driver = new EventFiringWebDriver( newRemoteWebDriverSetOptions(new URL(uriString), getWebDriverType()) );
+            driver = new EventFiringWebDriver( newRemoteWebDriverSetOptions(getTestRunType(), getWebDriverType()) );
         }
 
         tlDriver.set(driver);
 
-        initLogListenerAndWait(driver);
+        initLogListener(driver);
+        initWebDriverWait(driver);
         //Регистрируем наблюдатель
         driver.register(logListener);
 
@@ -127,39 +128,37 @@ public class DriverBaseReal extends DriverBase {
 
     protected WebDriver newDriverSetOptions(WebDriverType driverType)
     {
-        WebDriver    webDriver;
+        WebDriver    webDriver = null;
 
         if (driverType == WebDriverType.IE) {
             System.setProperty("webdriver.ie.driver", "C:\\Tools\\IEDriverServer.exe");
             webDriver = new InternetExplorerDriver(getIEOptions());
         }
         else
-            if (driverType == WebDriverType.Chrome) {
-                /*
-                 Use System.setProperty(...) this to PREVENT warning: "Only local connections are allowed."
-                 This will basically set whitelist all IP's, be careful with it for production enviornments,
-                 but you should be presented with a verbose warning: "All remote connections are allowed. Use a whitelist instead!"
-                */
-                System.setProperty("webdriver.chrome.whitelistedIps", "");
+        if (driverType == WebDriverType.Chrome) {
+            /*
+             Use System.setProperty(...) this to PREVENT warning: "Only local connections are allowed."
+             This will basically set whitelist all IP's, be careful with it for production enviornments,
+             but you should be presented with a verbose warning: "All remote connections are allowed. Use a whitelist instead!"
+            */
+            System.setProperty("webdriver.chrome.whitelistedIps", "");
 
-                webDriver = new ChromeDriver(
-                                new ChromeDriverService.Builder()
-                                    .usingDriverExecutable(new File ("C:\\Tools\\chromedriver.exe")).build(),
-                                getChromeOptions());
-                //webDriver.get("chrome://settings/clearBrowserData");
-            }
-            else
-                if (driverType == WebDriverType.Firefox) {
-                    System.setProperty("webdriver.gecko.driver", "C:\\Tools\\geckodriver.exe");
-                    webDriver = new FirefoxDriver(getFirefoxOptions());
-            }
-            else {
-                webDriver = new InternetExplorerDriver(getIEOptions());
-                setWebDriverType(WebDriverType.IE);
-            }
+            webDriver = new ChromeDriver(
+                            new ChromeDriverService.Builder()
+                                .usingDriverExecutable(new File ("C:\\Tools\\chromedriver.exe")).build(),
+                            getChromeOptions());
+            //webDriver.get("chrome://settings/clearBrowserData");
+        }
+        else
+            if (driverType == WebDriverType.Firefox) {
+                System.setProperty("webdriver.gecko.driver", "C:\\Tools\\geckodriver.exe");
+                webDriver = new FirefoxDriver(getFirefoxOptions());
+        }
 
-        webDriver.manage().deleteAllCookies();
-        printDriverCapabilities(webDriver);
+        if (webDriver != null) {
+            webDriver.manage().deleteAllCookies();
+            printDriverCapabilities(webDriver);
+        }
         return webDriver;
     }
 
@@ -277,50 +276,97 @@ public class DriverBaseReal extends DriverBase {
         }
     }
 
-    protected WebDriver newRemoteWebDriverSetOptions(URL remoteAddress, WebDriverType driverType)
+    protected WebDriver newRemoteWebDriverSetOptions(TestRunType testRunType, WebDriverType driverType) throws MalformedURLException
     {
-        WebDriver    webDriver;
+        WebDriver    webDriver = null;
 
-        if (driverType == WebDriverType.IE) {
-            webDriver = new RemoteWebDriver(remoteAddress, getRemoteIEOptions());
-        }
-        else
-        if (driverType == WebDriverType.Chrome) {
-            /*
-             Use this to PREVENT warning: "Only local connections are allowed."
-             This will basically set whitelist all IP's, be careful with it for production enviornments,
-             but you should be presented with a verbose warning: "All remote connections are allowed. Use a whitelist instead!"
-            */
-            System.setProperty("webdriver.chrome.whitelistedIps", "");
-            webDriver = new RemoteWebDriver(remoteAddress, getRemoteChromeOptions());
-            //webDriver.get("chrome://settings/clearBrowserData");
-        }
-        else
-        if (driverType == WebDriverType.Firefox) {
-            System.setProperty("webdriver.gecko.driver", "C:\\Tools\\geckodriver.exe");
-            webDriver = new RemoteWebDriver(remoteAddress, getRemoteFirefoxOptions());
-        }
-        else {
-            webDriver = new RemoteWebDriver(remoteAddress, getRemoteIEOptions());
-            setWebDriverType(WebDriverType.IE);
-        }
+        Boolean      useSelenoid = false;
+        String       uriString = "";
+        String       hostStr = driverBaseParams.getRemoteIpStr();
 
-        webDriver.manage().deleteAllCookies();
-        printDriverCapabilities(webDriver);
+        switch (testRunType)
+        {
+            case RemoteWin:
+                uriString = "http://" + hostStr + ":4444/wd/hub/";
+                useSelenoid = false;
+                break;
+
+            case RemoteUbuntu:
+                if (driverType == WebDriverType.IE)
+                    hostStr = getCurrentIpStr();
+
+                uriString = "http://" + hostStr + ":4444/wd/hub/";
+                useSelenoid = true;
+                break;
+
+            default:
+                System.out.println("Not valid TestRunType value: " + testRunType);
+        }
+        if (uriString != "")
+            switch (driverType)
+            {
+                case IE:
+                    if (useSelenoid) {
+                        try {
+                            selenoidProcess = StartLocalSelenoidServerForIE();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    webDriver = new RemoteWebDriver(new URL(uriString), getRemoteIEOptions(useSelenoid));
+                    break;
+
+                case Chrome:
+                    /*  Use this to PREVENT warning: "Only local connections are allowed."
+                     This will basically set whitelist all IP's, be careful with it for production enviornments,
+                     but you should be presented with a verbose warning: "All remote connections are allowed. Use a whitelist instead!"
+                    */
+                    System.setProperty("webdriver.chrome.whitelistedIps", "");
+                    webDriver = new RemoteWebDriver(new URL(uriString), getRemoteChromeOptions());
+                    break;
+
+                case Firefox:
+                    System.setProperty("webdriver.gecko.driver", "C:\\Tools\\geckodriver.exe");
+                    webDriver = new RemoteWebDriver(new URL(uriString), getRemoteFirefoxOptions());
+                    break;
+
+                default:
+                    System.out.println("Not valid WebDriverType value: " + driverType);
+            }
+
+        if (webDriver != null) {
+            webDriver.manage().deleteAllCookies();
+            printDriverCapabilities(webDriver);
+        }
         return webDriver;
     }
 
-    private InternetExplorerOptions getRemoteIEOptions()
+    private InternetExplorerOptions getRemoteIEOptions(Boolean useSelenoidExe)
     {
-        DesiredCapabilities caps = new DesiredCapabilities();
-        caps.setCapability("unexpectedAlertBehavior", "dimiss");
+        InternetExplorerOptions ieOptions = new InternetExplorerOptions();
+
+        ieOptions.setCapability("platformName", Platform.WINDOWS);
+        ieOptions.setCapability("browserVersion", "11");
+
+        ieOptions.setCapability("unexpectedAlertBehavior", "dimiss");
         //установка опций для игнорировния отличия масштаба от 100%
-        caps.setCapability(InternetExplorerDriver.IGNORE_ZOOM_SETTING, true);
-        //установка опций для игнорировния отличия настройки защищенного режима в разных зонах (не надежная работа)
-        //caps.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
-        InternetExplorerOptions ieOptions = new InternetExplorerOptions(caps);
+        ieOptions.setCapability(InternetExplorerDriver.IGNORE_ZOOM_SETTING, true);
+        //установка опций для игнорировния отличия настройки защищенного режима в разных зонах
+        // if (useSelenoidExe = true), enabling this options required !!!
+        ieOptions.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
+        // Для задания опции UnhandledPromptBehavior
         ieOptions.setUnhandledPromptBehaviour(UnexpectedAlertBehaviour.DISMISS);
 
+        if (useSelenoidExe)
+        {
+            String runName = getClass().getName();
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("name", runName);
+            map.put("sessionTimeout", "1m"); /* How to set session timeout */
+            ieOptions.setCapability("selenoid:options", map);
+        }
         return ieOptions;
     }
 
@@ -328,8 +374,9 @@ public class DriverBaseReal extends DriverBase {
     {
         ChromeOptions chromeOptions = new ChromeOptions();
 
+        chromeOptions.setCapability("platformName", Platform.LINUX);
         chromeOptions.setCapability("browserName", "chrome");
-        chromeOptions.setCapability("browserVersion", "85.0");
+        chromeOptions.setCapability("browserVersion", "112.0");
 
         Date date = new Date();
         DateTimeStringConverter dtConverter = new DateTimeStringConverter(null, "yyyyMMdd.HHmmss");
@@ -369,8 +416,9 @@ public class DriverBaseReal extends DriverBase {
     {
         FirefoxOptions firefoxOptions = new FirefoxOptions();
 
+        firefoxOptions.setCapability("platformName", Platform.LINUX);
         firefoxOptions.setCapability("browserName", "chrome");
-        firefoxOptions.setCapability("browserVersion", "85.0");
+        firefoxOptions.setCapability("browserVersion", "112.0");
 
         Date date = new Date();
         DateTimeStringConverter dtsc = new DateTimeStringConverter(null, "yyyyMMdd.HHmm");
@@ -402,5 +450,20 @@ public class DriverBaseReal extends DriverBase {
 
         return firefoxOptions;
     }
-
+    public Process StartLocalSelenoidServerForIE() throws IOException {
+        // Start the Selenoid.exe server using the selenoid.bat file on local Windows machine
+        // Set the path to the selenoid.bat file
+        String selenoidPath = DriverConst.selenoidBatFilePathName;
+        // Start the selenoid process
+        ProcessBuilder builder = new ProcessBuilder(selenoidPath);
+        Process process = builder.start();
+        //Sleep for the Selenoid.exe process to start up
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            //InterruptedException – if any thread has interrupted the current thread.
+            e.printStackTrace();
+        }
+        return process;
+    }
 }

@@ -1,5 +1,6 @@
 package ru.stqa.training.selenium.driverbase;
 
+import ru.stqa.training.selenium.driverbase.DriverDefault;
 
 public abstract class DriverConst {
     // константа времени (в сек) общих неявных ожиданий
@@ -16,4 +17,11 @@ public abstract class DriverConst {
     public  static final String remoteIpStr_WinServer2019 = "192.168.0.91";
     // Remote Ubuntu 20.4   with Docker "192.168.203.128"
     public  static final String remoteIpStr_Ubuntu_20_4 = "192.168.0.96";
+
+    public static final String chromeDriverExeName = "chromedriver.exe";
+    public static final String firefoxDriverExeName = "geckodriver.exe";
+    public static final String ieDriverExeName = "IEDriverServer.exe";
+    public static final String selenoidDriverExeName = "selenoid.exe";
+    public static final String selenoidBatFilePathName = "C:\\Tools\\selenoid.bat";
+    public static final String selenoidBatFileWorkingDirectory = "C:\\Tools\\";
 }

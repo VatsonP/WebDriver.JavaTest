@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 public interface DriverDefault {
 
     enum WebDriverType { IE, Chrome, Firefox }
-    enum TestRunType   { Local, Remote }
+    enum TestRunType   { Local, RemoteWin, RemoteUbuntu }
 
     class LogListener extends AbstractWebDriverEventListener {
 

@@ -3,6 +3,11 @@ package ru.stqa.training.selenium.driverbase;
 
 public class DriverBaseParams {
 
+    // initial const value of TestRunType
+    public static final DriverDefault.TestRunType defTestRunType = DriverDefault.TestRunType.Local;
+    // initial const value of WebDriverType
+    public static final DriverDefault.WebDriverType defWebDriverType = DriverDefault.WebDriverType.IE;
+
     // переменная времени (в сек) общих неявных ожиданий
     private int drvImplWaitTime = DriverConst.drvImplWaitTime;
     public  int getImplWaitTime() { return drvImplWaitTime; }

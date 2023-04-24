@@ -43,7 +43,7 @@ public abstract class TestBase
 
     @BeforeClass
     public static void startBeforeClass() {
-        DriverBase.startBeforeClass();
+        DriverBase.start1BeforeClass();
     }
 
     @Before
@@ -58,7 +58,9 @@ public abstract class TestBase
 
     @AfterClass
     public static void stopAfterClass() {
-        DriverBase.stopAfterClass();
+
+        DriverBase.stop1AfterClass();
+        DriverBase.stop2AfterClass();
     }
 
 }
