@@ -10,10 +10,10 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="ru.stqa.java-example.main" />
-    <orderEntry type="library" name="Gradle: junit:junit:4.12" level="project" />
+    <orderEntry type="library" name="Gradle: junit:junit:4.13.2" level="project" />
     <orderEntry type="library" name="Gradle: org.seleniumhq.selenium:selenium-java:3.141.59" level="project" />
     <orderEntry type="library" name="Gradle: commons-io:commons-io:2.7" level="project" />
-    <orderEntry type="library" name="Gradle: com.tngtech.java:junit-dataprovider:1.9.3" level="project" />
+    <orderEntry type="library" name="Gradle: com.tngtech.java:junit-dataprovider:1.13.1" level="project" />
     <orderEntry type="library" name="Gradle: org.hamcrest:hamcrest-core:1.3" level="project" />
     <orderEntry type="library" name="Gradle: org.seleniumhq.selenium:selenium-chrome-driver:3.141.59" level="project" />
     <orderEntry type="library" name="Gradle: org.seleniumhq.selenium:selenium-edge-driver:3.141.59" level="project" />
