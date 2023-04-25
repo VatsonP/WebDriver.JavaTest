@@ -68,4 +68,5 @@ java-example/build/reports/
 .idea/workspace.xml
 .idea/uiDesigner.xml
 .gradle/4.10/
+.gradle/4.10/javaCompile/
 .gradle/buildOutputCleanup/
