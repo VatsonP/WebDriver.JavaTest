@@ -24,8 +24,6 @@ public abstract class DriverBase implements DriverDefault {
     }
 
     protected static LogListener        logListener;
-    protected static TestResultListener testResultListener;
-    protected static JUnitCore          junitCore;
 
     protected static WebDriverWait wait;
     public static WebDriverWait getWebDriverWait() {

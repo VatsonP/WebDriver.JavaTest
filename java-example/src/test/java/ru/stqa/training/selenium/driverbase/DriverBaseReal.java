@@ -65,27 +65,6 @@ public class DriverBaseReal extends DriverBase {
         }
     }
 
-    protected void initTestResultListener(WebDriver webDrv) {
-        if (webDrv != null) {
-            testResultListener = new TestResultListener();
-            /*
-            We then register a TestResultListener with the JUnitCore instance using the addListener method.
-            The TestResultListener is a custom class that we created to listen to test events and
-            print the outcome of the test execution.
-            */
-            // Create a JUnitCore object
-            junitCore = new JUnitCore();
-
-            /*
-            By registering the TestResultListener with the JUnitCore instance, we are telling JUnit to use this listener
-            to handle test events during test execution. When a test event occurs, JUnit will call the appropriate
-            in the registered listener class, such as testFinished, to notify it of the event.
-            */
-            // Register the TestResultListener class
-            junitCore.addListener(testResultListener);
-        }
-    }
-
     protected void initWebDriverWait(WebDriver webDrv) {
         // Для установки общих неявных ожиданий
         driver.manage().timeouts().implicitlyWait(driverBaseParams.getImplWaitTime(), TimeUnit.SECONDS);
@@ -103,14 +82,6 @@ public class DriverBaseReal extends DriverBase {
     public void watcherFinished (Description description)
     {
         System.out.println("Test Finished: " + getCurrentTestName());
-
-        try {
-            testResultListener.testFinished(description);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-
     }
 
     //Before
@@ -161,12 +132,6 @@ public class DriverBaseReal extends DriverBase {
         // Регистрируем наблюдатель logListener - A wrapper around an arbitrary EventFiringWebDriver instance
         // which supports registering for events, for logging purposes.
         logListener.setDriver(driver);
-
-        // Создаем класс наблюдателя testResultListener
-        initTestResultListener(driver);
-        // Регистрируем наблюдатель testResultListener
-        // listen for Selenium WebDriver events and get the test result outcome.
-        testResultListener.setDriver(driver);
     }
 
     //After
