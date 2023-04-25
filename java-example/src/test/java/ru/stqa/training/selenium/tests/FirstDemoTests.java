@@ -23,7 +23,7 @@ public class FirstDemoTests extends TestBase {
 
     public FirstDemoTests()
     {
-        super(new DriverBaseParams());
+        super(DriverBaseParams.CreateDriverBaseParams() );
         setApp(new FirstDemoApp() );
     }
 

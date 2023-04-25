@@ -72,7 +72,7 @@ public abstract class DriverBase implements DriverDefault {
         if (tRunType == TestRunType.Local)
             return driverBaseParams.getLocalHostStr();
         else
-        if ((tRunType == TestRunType.RemoteWin) || ( tRunType == TestRunType.RemoteUbuntu))
+        if ((tRunType == TestRunType.RemoteWin) || (tRunType == TestRunType.RemoteUbuntu))
             return driverBaseParams.getLocalIpStr();
         else
             return driverBaseParams.getLocalIpStr();

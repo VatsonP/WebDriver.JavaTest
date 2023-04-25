@@ -6,7 +6,6 @@ import ru.stqa.training.selenium.testapp.UT8CheckProductApp;
 import ru.stqa.training.selenium.testbase.TestBase;
 
 
-
 public class UT8CheckProductTests extends TestBase {
 
     private static final long sleepTimeMSec = 1000;
@@ -22,10 +21,9 @@ public class UT8CheckProductTests extends TestBase {
 
     public UT8CheckProductTests()
     {
-        super(new DriverBaseParams(3,5));
+        super(DriverBaseParams.CreateDriverBaseParams(3,5));
         setApp(new UT8CheckProductApp(sleepTimeMSec) );
     }
-
 
     @Test
     public void TestMyCheckProduct() {

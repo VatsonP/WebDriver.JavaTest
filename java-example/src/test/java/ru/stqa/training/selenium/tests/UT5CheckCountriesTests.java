@@ -20,10 +20,9 @@ public class UT5CheckCountriesTests extends TestBase {
 
     public UT5CheckCountriesTests()
     {
-        super(new DriverBaseParams());
+        super(DriverBaseParams.CreateDriverBaseParams());
         setApp(new UT5CheckCountriesApp() );
     }
-
 
     @Test
     public void TestMyCheckCountries() {

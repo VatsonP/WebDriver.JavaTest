@@ -20,7 +20,7 @@ public class UT3CheckNewTabsTests extends TestBase {
 
     public UT3CheckNewTabsTests()
     {
-        super(new DriverBaseParams());
+        super(DriverBaseParams.CreateDriverBaseParams());
         setApp(new UT3CheckNewTabsApp() );
     }
 

@@ -4,9 +4,9 @@ package ru.stqa.training.selenium.driverbase;
 public class DriverBaseParams {
 
     // initial const value of TestRunType
-    public static final DriverDefault.TestRunType defTestRunType = DriverDefault.TestRunType.Local;
+    public static final DriverDefault.TestRunType defTestRunType = DriverDefault.TestRunType.RemoteUbuntu;
     // initial const value of WebDriverType
-    public static final DriverDefault.WebDriverType defWebDriverType = DriverDefault.WebDriverType.IE;
+    public static final DriverDefault.WebDriverType defWebDriverType = DriverDefault.WebDriverType.Firefox;
 
     // переменная времени (в сек) общих неявных ожиданий
     private int drvImplWaitTime = DriverConst.drvImplWaitTime;
@@ -32,38 +32,7 @@ public class DriverBaseParams {
     private String remoteIpStr = DriverConst.remoteIpStr_Ubuntu_20_4;
     public String getRemoteIpStr() { return remoteIpStr; }  // get Remote Host Ip
 
-
-    public DriverBaseParams() {
-    }
-
-    public DriverBaseParams(int drvImplWaitTime)
-    {
-        this.drvImplWaitTime = drvImplWaitTime;
-    }
-
-    public DriverBaseParams(int drvImplWaitTime, int drvExplWaitTime)
-    {
-        this.drvImplWaitTime = drvImplWaitTime;
-        this.drvExplWaitTime = drvExplWaitTime;
-    }
-
-    public DriverBaseParams(int drvImplWaitTime, int drvExplWaitTime, int drvMaxWaitTime)
-    {
-        this.drvImplWaitTime = drvImplWaitTime;
-        this.drvExplWaitTime = drvExplWaitTime;
-        this.drvMaxWaitTime = drvMaxWaitTime;
-    }
-
-    public DriverBaseParams(int drvImplWaitTime, int drvExplWaitTime, int drvMaxWaitTime,
-                            String localIpStr)
-    {
-        this.drvImplWaitTime = drvImplWaitTime;
-        this.drvExplWaitTime = drvExplWaitTime;
-        this.drvMaxWaitTime = drvMaxWaitTime;
-        this.localIpStr     = localIpStr;
-    }
-
-    public DriverBaseParams(int drvImplWaitTime, int drvExplWaitTime, int drvMaxWaitTime,
+    private DriverBaseParams(int drvImplWaitTime, int drvExplWaitTime, int drvMaxWaitTime,
                             String localIpStr, String remoteIpStr)
     {
         this.drvImplWaitTime = drvImplWaitTime;
@@ -72,4 +41,52 @@ public class DriverBaseParams {
         this.localIpStr     = localIpStr;
         this.remoteIpStr    = remoteIpStr;
     }
+
+    public static DriverBaseParams CreateDriverBaseParams() {
+        int drvImplWaitTime = DriverConst.drvImplWaitTime;
+        int drvExplWaitTime = DriverConst.drvExplWaitTime;
+        int drvMaxWaitTime = DriverConst.drvMaxWaitTime;
+
+        return CreateDriverBaseParams(drvImplWaitTime, drvExplWaitTime, drvMaxWaitTime);
+    }
+
+    public static DriverBaseParams CreateDriverBaseParams(int drvImplWaitTime)
+    {
+        int drvExplWaitTime = DriverConst.drvExplWaitTime;
+        int drvMaxWaitTime = DriverConst.drvMaxWaitTime;
+
+        return CreateDriverBaseParams(drvImplWaitTime, drvExplWaitTime, drvMaxWaitTime);
+    }
+
+    public static DriverBaseParams CreateDriverBaseParams(int drvImplWaitTime, int drvExplWaitTime)
+    {
+        int drvMaxWaitTime = DriverConst.drvMaxWaitTime;
+
+        return CreateDriverBaseParams(drvImplWaitTime, drvExplWaitTime, drvMaxWaitTime);
+    }
+
+    public static DriverBaseParams CreateDriverBaseParams(int drvImplWaitTime, int drvExplWaitTime, int drvMaxWaitTime)
+    {
+
+        String      remoteIpStr = "";
+
+        switch (defTestRunType)
+        {
+            case RemoteWin:
+                remoteIpStr = DriverConst.remoteIpStr_WinServer2019;
+                break;
+
+            case RemoteUbuntu:
+                remoteIpStr = DriverConst.remoteIpStr_Ubuntu_20_4;
+                break;
+
+            default:
+                remoteIpStr = DriverConst.remoteIpStr_Ubuntu_20_4;
+                break;
+        }
+
+        return new DriverBaseParams(drvImplWaitTime, drvExplWaitTime, drvMaxWaitTime, DriverConst.localIpStr_Win, remoteIpStr);
+    }
+
+
 }

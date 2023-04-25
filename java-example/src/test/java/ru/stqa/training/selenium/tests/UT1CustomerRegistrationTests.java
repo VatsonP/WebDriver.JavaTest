@@ -30,10 +30,9 @@ public class UT1CustomerRegistrationTests extends TestBase {
 
     public UT1CustomerRegistrationTests()
     {
-        super(new DriverBaseParams());
+        super(DriverBaseParams.CreateDriverBaseParams());
         setApp(new UT1CustomerRegistrationApp());
     }
-
 
     @Test
     @UseDataProvider(value = "validCustomers", location = DataProviders.class)

@@ -87,8 +87,6 @@ public class DriverBaseReal extends DriverBase {
     //Before
     public void startBefore() throws MalformedURLException
     {
-        System.out.println("startBefore(): " + getCurrentTestName());
-
         setTestRunType();
         setWebDriverType();
         setCurrentIpStr( defineCurrentIpStr(getTestRunType()) );
@@ -136,8 +134,6 @@ public class DriverBaseReal extends DriverBase {
 
     //After
     public void stopAfter() {
-        System.out.println("stopAfter(): " + getCurrentTestName());
-
         saveBrowserLog(getTestRunType(), getWebDriverType(), wdLogs, getDriverCapabilities(driver), getCurrentTestName());
     }
 
@@ -295,6 +291,7 @@ public class DriverBaseReal extends DriverBase {
         WebDriver    webDriver = null;
 
         Boolean      useSelenoid = false;
+        Boolean      useWinPaths = false;
         String       uriString = "";
         String       hostStr = driverBaseParams.getRemoteIpStr();
 
@@ -303,14 +300,17 @@ public class DriverBaseReal extends DriverBase {
             case RemoteWin:
                 uriString = "http://" + hostStr + ":4444/wd/hub/";
                 useSelenoid = false;
+                useWinPaths = true;
                 break;
 
             case RemoteUbuntu:
-                if (driverType == WebDriverType.IE)
+                if (driverType == WebDriverType.IE) {
+                    useSelenoid = true;
                     hostStr = getCurrentIpStr();
+                }
 
                 uriString = "http://" + hostStr + ":4444/wd/hub/";
-                useSelenoid = true;
+                useWinPaths = false;
                 break;
 
             default:
@@ -337,12 +337,12 @@ public class DriverBaseReal extends DriverBase {
                      but you should be presented with a verbose warning: "All remote connections are allowed. Use a whitelist instead!"
                     */
                     System.setProperty("webdriver.chrome.whitelistedIps", "");
-                    webDriver = new RemoteWebDriver(new URL(uriString), getRemoteChromeOptions());
+                    webDriver = new RemoteWebDriver(new URL(uriString), getRemoteChromeOptions(useWinPaths));
                     break;
 
                 case Firefox:
                     System.setProperty("webdriver.gecko.driver", "C:\\Tools\\geckodriver.exe");
-                    webDriver = new RemoteWebDriver(new URL(uriString), getRemoteFirefoxOptions());
+                    webDriver = new RemoteWebDriver(new URL(uriString), getRemoteFirefoxOptions(useWinPaths));
                     break;
 
                 default:
@@ -380,7 +380,7 @@ public class DriverBaseReal extends DriverBase {
         return ieOptions;
     }
 
-    private ChromeOptions getRemoteChromeOptions()
+    private ChromeOptions getRemoteChromeOptions(Boolean useWinPaths)
     {
         ChromeOptions chromeOptions = new ChromeOptions();
 
@@ -403,31 +403,33 @@ public class DriverBaseReal extends DriverBase {
         chromeOptions.setCapability("selenoid:options", map);
 
         //--Указан путь к последней версии Chrome в portable варианте
-        String path = getChromePathStr();
-        if (!path.equals(EmptyStr)) {
-            chromeOptions.setBinary(path);
-        } else {
-            System.out.println("Chrome.exe file could not be found in method getChromePathStr().");
+        if(useWinPaths) {
+            String path = getChromePathStr();
+            if (!path.equals(EmptyStr)) {
+                chromeOptions.setBinary(path);
+            } else {
+                System.out.println("Chrome.exe file could not be found in method getChromePathStr().");
+            }
+            //--Задаем опции коммандной строки соотв. браузера
+            chromeOptions.setCapability("--profile-directory", "Default");
+            //Use custom profile(also called user data directory)
+            chromeOptions.setCapability("user-data-dir","C:\\Temp\\ChromeProfile");
         }
         //--Задаем setCapability
         chromeOptions.setCapability("unexpectedAlertBehavior", "dimiss");
         //--Задаем setCapability
         chromeOptions.setCapability("acceptInsecureCerts", false);
         chromeOptions.addArguments("--lang=ru");
-        //--Задаем опции коммандной строки соотв. браузера
-        //options.addArguments("start-fullscreen");
-        //Use custom profile(also called user data directory)
-        chromeOptions.addArguments("user-data-dir=" + System.getProperty("user.home") + "\\AppData\\Local\\Google\\Chrome\\User Data");
 
         return chromeOptions;
     }
 
-    private FirefoxOptions getRemoteFirefoxOptions()
+    private FirefoxOptions getRemoteFirefoxOptions(Boolean useWinPaths)
     {
         FirefoxOptions firefoxOptions = new FirefoxOptions();
 
         firefoxOptions.setCapability("platformName", Platform.LINUX);
-        firefoxOptions.setCapability("browserName", "chrome");
+        firefoxOptions.setCapability("browserName", "firefox");
         firefoxOptions.setCapability("browserVersion", "112.0");
 
         Date date = new Date();
@@ -443,20 +445,22 @@ public class DriverBaseReal extends DriverBase {
         map.put("videoScreenSize", "1280x720");
         map.put("screenResolution", "1920x1080x24");
         firefoxOptions.setCapability("selenoid:options", map);
+
         //Set firefox binary path
-        String path = getFirefoxPathStr();
-        if (!path.equals(EmptyStr)) {
-            firefoxOptions.setBinary(path);
-        } else {
-            System.out.println("Chrome.exe file could not be found in method getChromePathStr().");
+        if(useWinPaths) {
+            String path = getFirefoxPathStr();
+            if (!path.equals(EmptyStr)) {
+                firefoxOptions.setBinary(path);
+            } else {
+                System.out.println("Chrome.exe file could not be found in method getChromePathStr().");
+            }
+            //установка профиля пользователя для запуска браузера
+            setFirefoxProfile(firefoxOptions);
         }
         //--Задаем setCapability
         firefoxOptions.setCapability("acceptInsecureCerts", false);
         //--Задаем опции коммандной строки соотв. браузера
         //firefoxOptions.addArguments("-private-window");
-
-        //установка профиля пользователя для запуска браузера
-        setFirefoxProfile(firefoxOptions);
 
         return firefoxOptions;
     }

@@ -24,7 +24,7 @@ public class UT2LeftMenuClickTests extends TestBase {
 
     public UT2LeftMenuClickTests()
     {
-        super(new DriverBaseParams(3, 5));
+        super(DriverBaseParams.CreateDriverBaseParams(3, 5));
 
         setApp(new UT2LeftMenuClickApp(sleepTimeMenuMSec,
                                        sleepTimeSubmenuMSec,

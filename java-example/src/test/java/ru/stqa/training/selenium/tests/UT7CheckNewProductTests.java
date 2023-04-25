@@ -22,10 +22,9 @@ public class UT7CheckNewProductTests extends TestBase {
 
     public UT7CheckNewProductTests()
     {
-        super(new DriverBaseParams());
+        super(DriverBaseParams.CreateDriverBaseParams());
         setApp(new UT7CheckNewProductApp(sleepTimeMSec) );
     }
-
 
     @Test
     public void TestMyCheckNewProduct() {

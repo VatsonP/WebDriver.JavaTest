@@ -20,10 +20,9 @@ public class UT4CheckCartTests extends TestBase {
 
     public UT4CheckCartTests()
     {
-        super(new DriverBaseParams());
+        super(DriverBaseParams.CreateDriverBaseParams());
         setApp(new UT4CheckCartApp() );
     }
-
 
     @Test
     public void TestMyCheckCart() {
