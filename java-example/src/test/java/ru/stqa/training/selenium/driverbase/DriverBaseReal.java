@@ -4,6 +4,7 @@ import javafx.util.converter.DateTimeStringConverter;
 
 import org.junit.runner.Description;
 
+import org.junit.runner.JUnitCore;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.*;
 import org.openqa.selenium.firefox.*;
@@ -14,7 +15,6 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.*;
 
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.logging.Logs;
@@ -41,18 +41,49 @@ public class DriverBaseReal extends DriverBase {
     //must be initialized after the WebDriver create
     private Logs wdLogs;
 
+    protected void initWebDriverCapabilities(WebDriver webDrv)
+    {
+        if (webDrv != null) {
+            webDrv.manage().deleteAllCookies();
+            printDriverCapabilities(webDrv);
+        }
+    }
+
     protected void initLogListener(WebDriver webDrv) {
-        wdLogs = webDrv.manage().logs();
+        if (webDrv != null) {
+            wdLogs = webDrv.manage().logs();
 
-        // for write log file on error
-        Path baseRelativePath = Paths.get("","Log");
-        Path   baseFullPath     = baseRelativePath.toAbsolutePath();
+            // for write log file on error
+            Path baseRelativePath = Paths.get("", "Log");
+            Path baseFullPath = baseRelativePath.toAbsolutePath();
 
-        createBaseLogDir(baseFullPath);
+            createBaseLogDir(baseFullPath);
 
-        LogWriter logWriter   = new LogWriter(wdLogs, baseFullPath, getCurrentTestName());
-        logWriter.LogWrite("currentTestName", getCurrentTestName());
-        logListener = new LogListener(logWriter);
+            LogWriter logWriter = new LogWriter(wdLogs, baseFullPath, getCurrentTestName());
+            logWriter.LogWrite("currentTestName", getCurrentTestName());
+            logListener = new LogListener(logWriter);
+        }
+    }
+
+    protected void initTestResultListener(WebDriver webDrv) {
+        if (webDrv != null) {
+            testResultListener = new TestResultListener();
+            /*
+            We then register a TestResultListener with the JUnitCore instance using the addListener method.
+            The TestResultListener is a custom class that we created to listen to test events and
+            print the outcome of the test execution.
+            */
+            // Create a JUnitCore object
+            junitCore = new JUnitCore();
+
+            /*
+            By registering the TestResultListener with the JUnitCore instance, we are telling JUnit to use this listener
+            to handle test events during test execution. When a test event occurs, JUnit will call the appropriate
+            in the registered listener class, such as testFinished, to notify it of the event.
+            */
+            // Register the TestResultListener class
+            junitCore.addListener(testResultListener);
+        }
     }
 
     protected void initWebDriverWait(WebDriver webDrv) {
@@ -66,15 +97,26 @@ public class DriverBaseReal extends DriverBase {
     {
         //Заполняем переменную с именем текущего выполняющегося теста
         setCurrentTestName(description.getMethodName());
-        System.out.println("Starting test: " + getCurrentTestName());
+        System.out.println("Test Starting: " + getCurrentTestName());
     }
 
-    public void watcherFinished (Description description) {
-        System.out.println("Finish test: " + getCurrentTestName());
+    public void watcherFinished (Description description)
+    {
+        System.out.println("Test Finished: " + getCurrentTestName());
+
+        try {
+            testResultListener.testFinished(description);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     //Before
-    public void startBefore() throws MalformedURLException {
+    public void startBefore() throws MalformedURLException
+    {
+        System.out.println("startBefore(): " + getCurrentTestName());
 
         setTestRunType();
         setWebDriverType();
@@ -87,12 +129,7 @@ public class DriverBaseReal extends DriverBase {
                 driver.unregister(logListener);
             }
 
-            initLogListener(driver);
-            initWebDriverWait(driver);
-            //Регистрируем наблюдатель
-            driver.register(logListener);
-
-            driver.manage().deleteAllCookies();
+            initAddDriverFeatures(driver);
             return;
         }
 
@@ -108,18 +145,34 @@ public class DriverBaseReal extends DriverBase {
 
         tlDriver.set(driver);
 
-        initLogListener(driver);
-        initWebDriverWait(driver);
-        //Регистрируем наблюдатель
-        driver.register(logListener);
+        initAddDriverFeatures(driver);
 
         // Функционал из @After stop() ... был закоментирован и заменен на этот - addShutdownHook(...),
         // для выполнения только один раз в конце всех тестов
         //Runtime.getRuntime().addShutdownHook( new Thread(() -> {driver.quit(); driver = null;} ));
     }
 
+    public void initAddDriverFeatures(EventFiringWebDriver driver)
+    {
+        initLogListener(driver);
+        initWebDriverCapabilities(driver);
+        initWebDriverWait(driver);
+
+        // Регистрируем наблюдатель logListener - A wrapper around an arbitrary EventFiringWebDriver instance
+        // which supports registering for events, for logging purposes.
+        logListener.setDriver(driver);
+
+        // Создаем класс наблюдателя testResultListener
+        initTestResultListener(driver);
+        // Регистрируем наблюдатель testResultListener
+        // listen for Selenium WebDriver events and get the test result outcome.
+        testResultListener.setDriver(driver);
+    }
+
     //After
     public void stopAfter() {
+        System.out.println("stopAfter(): " + getCurrentTestName());
+
         saveBrowserLog(getTestRunType(), getWebDriverType(), wdLogs, getDriverCapabilities(driver), getCurrentTestName());
     }
 
@@ -155,10 +208,6 @@ public class DriverBaseReal extends DriverBase {
                 webDriver = new FirefoxDriver(getFirefoxOptions());
         }
 
-        if (webDriver != null) {
-            webDriver.manage().deleteAllCookies();
-            printDriverCapabilities(webDriver);
-        }
         return webDriver;
     }
 
@@ -335,10 +384,6 @@ public class DriverBaseReal extends DriverBase {
                     System.out.println("Not valid WebDriverType value: " + driverType);
             }
 
-        if (webDriver != null) {
-            webDriver.manage().deleteAllCookies();
-            printDriverCapabilities(webDriver);
-        }
         return webDriver;
     }
 
@@ -450,6 +495,7 @@ public class DriverBaseReal extends DriverBase {
 
         return firefoxOptions;
     }
+
     public Process StartLocalSelenoidServerForIE() throws IOException {
         // Start the Selenoid.exe server using the selenoid.bat file on local Windows machine
         // Set the path to the selenoid.bat file

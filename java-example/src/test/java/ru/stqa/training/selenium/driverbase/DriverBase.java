@@ -1,6 +1,7 @@
 package ru.stqa.training.selenium.driverbase;
 
 import org.junit.runner.Description;
+import org.junit.runner.JUnitCore;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -22,7 +23,9 @@ public abstract class DriverBase implements DriverDefault {
         return driver;
     }
 
-    protected static LogListener          logListener;
+    protected static LogListener        logListener;
+    protected static TestResultListener testResultListener;
+    protected static JUnitCore          junitCore;
 
     protected static WebDriverWait wait;
     public static WebDriverWait getWebDriverWait() {
@@ -89,6 +92,8 @@ public abstract class DriverBase implements DriverDefault {
             currentTestName = newCurrentTestName;
     }
 
+    protected abstract void initWebDriverCapabilities(WebDriver webDriver);
+
     protected abstract void initLogListener(WebDriver webDrv);
 
     protected abstract void initWebDriverWait(WebDriver webDrv);
@@ -120,7 +125,7 @@ public abstract class DriverBase implements DriverDefault {
         // Terminate the Selenium webDriver Windows process
         TerminateLocalSeleniumBrowsersServer(getTestRunType(), getWebDriverType());
         // Terminate the selenoidProcess and the associated selenoid.exe Windows process
-       TerminateLocalSelenoidServerForIE(getTestRunType(), getWebDriverType());
+        TerminateLocalSelenoidServerForIE(getTestRunType(), getWebDriverType());
     }
 
     private static void TerminateLocalSeleniumBrowsersServer(TestRunType testRunType, WebDriverType driverType)

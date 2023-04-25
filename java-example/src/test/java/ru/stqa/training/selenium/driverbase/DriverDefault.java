@@ -20,7 +20,14 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.support.events.AbstractWebDriverEventListener;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.logging.Logs;
+import org.openqa.selenium.support.events.WebDriverEventListener;
+
+import org.junit.runner.Description;
+import org.junit.runner.notification.RunListener;
+import org.junit.runner.notification.Failure;
+import org.junit.runner.Result;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,10 +46,16 @@ public interface DriverDefault {
     class LogListener extends AbstractWebDriverEventListener {
 
         private LogWriter lw;
+        private EventFiringWebDriver driver;
 
         public LogListener(LogWriter logWriter)
         {
             lw = logWriter;
+        }
+
+        public void setDriver(EventFiringWebDriver driver) {
+            this.driver = driver;
+            this.driver.register(this);
         }
 
         @Override
@@ -58,6 +71,46 @@ public interface DriverDefault {
         @Override
         public void onException(Throwable throwable, WebDriver driver) {
             lw.LogWrite("onException", "Error : " + throwable.toString());
+        }
+    }
+
+    // This code uses EventFiringWebDriver to listen for Selenium WebDriver events and get the test result outcome.
+    public class TestResultListener extends AbstractTestResultListener {
+
+        private EventFiringWebDriver driver;
+
+        public void setDriver(EventFiringWebDriver driver) {
+            this.driver = driver;
+            this.driver.register(this);
+        }
+        @Override
+        public void testFailure(Failure failure) {
+            System.out.println("Test Failed: " + failure.getDescription().getDisplayName());
+        }
+
+        @Override
+        public void testAssumptionFailure(Failure failure) {
+            System.out.println("Test Assumption Failed: " + failure.getDescription().getDisplayName());
+        }
+
+        @Override
+        public void testFinished(Description description) throws Exception {
+            String className = description.getClassName();
+            String methodName = description.getMethodName();
+
+            // TODO - getFailures()
+            /*
+            for (Failure failure : getFailures()) {
+                if (failure.getDescription().equals(description)) {
+                    // Test failed
+                    System.out.println("Test Result: " + className + "." + methodName + " failed with error:");
+                    System.out.println(failure.getTrace());
+                    return;
+                }
+            }
+            */
+            // Test passed
+            System.out.println("Test Result: " + className + "." + methodName + " passed");
         }
     }
 
@@ -329,4 +382,116 @@ public interface DriverDefault {
             ex.printStackTrace();
         }
     }
+    // ----------------------------------------------------------------------------------------------------------------
+    public abstract class AbstractTestResultListener extends RunListener implements WebDriverEventListener {
+
+        public void beforeAlertAccept(WebDriver driver) {
+            // Do nothing.
+        }
+
+        public void afterAlertAccept(WebDriver driver) {
+            // Do nothing.
+        }
+
+        public void afterAlertDismiss(WebDriver driver) {
+            // Do nothing.
+        }
+
+        public void beforeAlertDismiss(WebDriver driver) {
+            // Do nothing.
+        }
+
+        public void beforeNavigateTo(String url, WebDriver driver) {
+            // Do nothing.
+        }
+
+        public void afterNavigateTo(String url, WebDriver driver) {
+            // Do nothing.
+        }
+
+        public void beforeNavigateBack(WebDriver driver) {
+            // Do nothing.
+        }
+
+        public void afterNavigateBack(WebDriver driver) {
+            // Do nothing.
+        }
+
+        public void beforeNavigateForward(WebDriver driver) {
+            // Do nothing.
+        }
+
+        public void afterNavigateForward(WebDriver driver) {
+            // Do nothing.
+        }
+
+        public void beforeNavigateRefresh(WebDriver driver) {
+            // Do nothing.
+        }
+
+        public void afterNavigateRefresh(WebDriver driver) {
+            // Do nothing.
+        }
+
+        public void beforeFindBy(By by, WebElement element, WebDriver driver) {
+            // Do nothing.
+        }
+
+        public void afterFindBy(By by, WebElement element, WebDriver driver) {
+            // Do nothing.
+        }
+
+        public void beforeClickOn(WebElement element, WebDriver driver) {
+            // Do nothing.
+        }
+
+        public void afterClickOn(WebElement element, WebDriver driver) {
+            // Do nothing.
+        }
+
+        public void beforeChangeValueOf(WebElement element, WebDriver driver, CharSequence[] keysToSend) {
+            // Do nothing.
+        }
+
+        public void afterChangeValueOf(WebElement element, WebDriver driver, CharSequence[] keysToSend) {
+            // Do nothing.
+        }
+
+        public void beforeScript(String script, WebDriver driver) {
+            // Do nothing
+        }
+
+        public void afterScript(String script, WebDriver driver) {
+            // Do nothing
+        }
+
+        public void afterSwitchToWindow(String windowName, WebDriver driver) {
+            // Do nothing
+        }
+
+        public void beforeSwitchToWindow(String windowName, WebDriver driver) {
+            // Do nothing
+        }
+
+        public void onException(Throwable throwable, WebDriver driver) {
+            // Do nothing
+        }
+
+        public <X> void beforeGetScreenshotAs(OutputType<X> target) {
+            // Do nothing
+        }
+
+        public <X> void afterGetScreenshotAs(OutputType<X> target, X screenshot) {
+            // Do nothing
+        }
+
+        public void beforeGetText(WebElement element, WebDriver driver) {
+            // Do nothing
+        }
+
+        public void afterGetText(WebElement element, WebDriver driver, String text) {
+            // Do nothing
+        }
+    }
+
 }
