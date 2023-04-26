@@ -109,7 +109,7 @@ public class DriverBaseReal extends DriverBase {
         else
         if ((getTestRunType() == TestRunType.RemoteWin) || (getTestRunType() == TestRunType.RemoteUbuntu)) {
             // Создаем обертку класса WebDriver для последующего сохранения  логов
-            driver = new EventFiringWebDriver( newRemoteWebDriverSetOptions(getTestRunType(), getWebDriverType()) );
+            driver = new EventFiringWebDriver( newRemoteWebDriverSetOptions(getWebDriverType()) );
         }
 
         tlDriver.set(driver);
@@ -286,49 +286,29 @@ public class DriverBaseReal extends DriverBase {
         }
     }
 
-    protected WebDriver newRemoteWebDriverSetOptions(TestRunType testRunType, WebDriverType driverType) throws MalformedURLException
+    protected WebDriver newRemoteWebDriverSetOptions(WebDriverType driverType) throws MalformedURLException
     {
         WebDriver    webDriver = null;
 
-        Boolean      useSelenoid = false;
-        Boolean      useWinPaths = false;
-        String       uriString = "";
-        String       hostStr = driverBaseParams.getRemoteIpStr();
+        String       hostStr = "";
 
-        switch (testRunType)
-        {
-            case RemoteWin:
-                uriString = "http://" + hostStr + ":4444/wd/hub/";
-                useSelenoid = false;
-                useWinPaths = true;
-                break;
+        if (driverType == WebDriverType.IE)
+            hostStr = getCurrentIpStr();
+        else
+            hostStr = driverBaseParams.getRemoteIpStr();
 
-            case RemoteUbuntu:
-                if (driverType == WebDriverType.IE) {
-                    useSelenoid = true;
-                    hostStr = getCurrentIpStr();
-                }
+        String uriString = "http://" + hostStr + ":4444/wd/hub/";
 
-                uriString = "http://" + hostStr + ":4444/wd/hub/";
-                useWinPaths = false;
-                break;
-
-            default:
-                System.out.println("Not valid TestRunType value: " + testRunType);
-        }
         if (uriString != "")
             switch (driverType)
             {
                 case IE:
-                    if (useSelenoid) {
-                        try {
-                            selenoidProcess = StartLocalSelenoidServerForIE();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                    try {
+                        selenoidProcess = StartLocalSelenoidServerForIE();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-
-                    webDriver = new RemoteWebDriver(new URL(uriString), getRemoteIEOptions(useSelenoid));
+                    webDriver = new RemoteWebDriver(new URL(uriString), getRemoteIEOptions());
                     break;
 
                 case Chrome:
@@ -337,12 +317,12 @@ public class DriverBaseReal extends DriverBase {
                      but you should be presented with a verbose warning: "All remote connections are allowed. Use a whitelist instead!"
                     */
                     System.setProperty("webdriver.chrome.whitelistedIps", "");
-                    webDriver = new RemoteWebDriver(new URL(uriString), getRemoteChromeOptions(useWinPaths));
+                    webDriver = new RemoteWebDriver(new URL(uriString), getRemoteChromeOptions());
                     break;
 
                 case Firefox:
                     System.setProperty("webdriver.gecko.driver", "C:\\Tools\\geckodriver.exe");
-                    webDriver = new RemoteWebDriver(new URL(uriString), getRemoteFirefoxOptions(useWinPaths));
+                    webDriver = new RemoteWebDriver(new URL(uriString), getRemoteFirefoxOptions());
                     break;
 
                 default:
@@ -352,7 +332,7 @@ public class DriverBaseReal extends DriverBase {
         return webDriver;
     }
 
-    private InternetExplorerOptions getRemoteIEOptions(Boolean useSelenoidExe)
+    private InternetExplorerOptions getRemoteIEOptions()
     {
         InternetExplorerOptions ieOptions = new InternetExplorerOptions();
 
@@ -368,19 +348,17 @@ public class DriverBaseReal extends DriverBase {
         // Для задания опции UnhandledPromptBehavior
         ieOptions.setUnhandledPromptBehaviour(UnexpectedAlertBehaviour.DISMISS);
 
-        if (useSelenoidExe)
-        {
-            String runName = getClass().getName();
+        String runName = getClass().getName();
 
-            Map<String, Object> map = new HashMap<>();
-            map.put("name", runName);
-            map.put("sessionTimeout", "1m"); /* How to set session timeout */
-            ieOptions.setCapability("selenoid:options", map);
-        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", runName);
+        map.put("sessionTimeout", "1m"); /* How to set session timeout */
+        ieOptions.setCapability("selenoid:options", map);
+
         return ieOptions;
     }
 
-    private ChromeOptions getRemoteChromeOptions(Boolean useWinPaths)
+    private ChromeOptions getRemoteChromeOptions()
     {
         ChromeOptions chromeOptions = new ChromeOptions();
 
@@ -402,29 +380,18 @@ public class DriverBaseReal extends DriverBase {
         map.put("screenResolution", "1920x1080x24");
         chromeOptions.setCapability("selenoid:options", map);
 
-        //--Указан путь к последней версии Chrome в portable варианте
-        if(useWinPaths) {
-            String path = getChromePathStr();
-            if (!path.equals(EmptyStr)) {
-                chromeOptions.setBinary(path);
-            } else {
-                System.out.println("Chrome.exe file could not be found in method getChromePathStr().");
-            }
-            //--Задаем опции коммандной строки соотв. браузера
-            chromeOptions.setCapability("--profile-directory", "Default");
-            //Use custom profile(also called user data directory)
-            chromeOptions.setCapability("user-data-dir","C:\\Temp\\ChromeProfile");
-        }
         //--Задаем setCapability
         chromeOptions.setCapability("unexpectedAlertBehavior", "dimiss");
         //--Задаем setCapability
         chromeOptions.setCapability("acceptInsecureCerts", false);
+        chromeOptions.addArguments("start-fullscreen");
         chromeOptions.addArguments("--lang=ru");
+        chromeOptions.addArguments("--no-sandbox");
 
         return chromeOptions;
     }
 
-    private FirefoxOptions getRemoteFirefoxOptions(Boolean useWinPaths)
+    private FirefoxOptions getRemoteFirefoxOptions()
     {
         FirefoxOptions firefoxOptions = new FirefoxOptions();
 
@@ -446,17 +413,6 @@ public class DriverBaseReal extends DriverBase {
         map.put("screenResolution", "1920x1080x24");
         firefoxOptions.setCapability("selenoid:options", map);
 
-        //Set firefox binary path
-        if(useWinPaths) {
-            String path = getFirefoxPathStr();
-            if (!path.equals(EmptyStr)) {
-                firefoxOptions.setBinary(path);
-            } else {
-                System.out.println("Chrome.exe file could not be found in method getChromePathStr().");
-            }
-            //установка профиля пользователя для запуска браузера
-            setFirefoxProfile(firefoxOptions);
-        }
         //--Задаем setCapability
         firefoxOptions.setCapability("acceptInsecureCerts", false);
         //--Задаем опции коммандной строки соотв. браузера
