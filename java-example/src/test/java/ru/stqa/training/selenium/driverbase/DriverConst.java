@@ -13,9 +13,9 @@ public abstract class DriverConst {
     public static final String localHostStr = "localhost";
     // Local Windows Ip
     public  static final String localIpStr_Win = "192.168.0.101";
-    // Remote WinServer2019 with Docker "192.168.0.91"
-    public  static final String remoteIpStr_WinServer2019 = "192.168.0.91";
-    // Remote Ubuntu 20.4   with Docker "192.168.203.128"
+    // Remote WinServer2019 with Docker "192.168.0.87"
+    public  static final String remoteIpStr_WinServer2019 = "192.168.0.87";
+    // Remote Ubuntu 20.4   with Docker "192.168.0.96"
     public  static final String remoteIpStr_Ubuntu_20_4 = "192.168.0.96";
 
     public static final String chromeDriverExeName = "chromedriver.exe";
